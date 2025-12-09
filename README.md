@@ -345,6 +345,10 @@ button:hover {
 const ADMIN_USER = "Admin";
 const ADMIN_PASS = "M@tteo2007_";
 
+// Références DOM explicites (fixe le problème "posts non affichés")
+const searchInput = document.getElementById('searchInput');
+const postsContainer = document.getElementById('posts');
+
 function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
 function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
 
@@ -737,7 +741,7 @@ function renderPosts() {
     let posts = getPosts();
     let user = localStorage.getItem("user");
     let filter = currentFilter;
-    let query = searchInput.value.toLowerCase();
+    let query = (searchInput && searchInput.value ? searchInput.value.toLowerCase() : "");
 
     // Filtre recherche
     posts = posts.filter(p => p.content.toLowerCase().includes(query));
@@ -755,7 +759,7 @@ function renderPosts() {
 
         let pfp = p.anonymous
             ? "https://i.imgur.com/CJH0pCj.png"
-            : getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
+            : (getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
 
         html += `
         <div class="post">
@@ -794,7 +798,7 @@ function renderPosts() {
         </div>`;
     });
 
-    postsContainer.innerHTML = html;
+    if (postsContainer) postsContainer.innerHTML = html;
 }
 
 function renderCommentsHTML(post) {
@@ -832,6 +836,7 @@ function vote(id, val) {
 
 function toggleComments(id) {
     let box = document.getElementById("comments-" + id);
+    if (!box) return;
     box.style.display = box.style.display === "none" ? "block" : "none";
 }
 
@@ -883,7 +888,8 @@ let currentFilter = "all";
 function setFilter(f) {
     currentFilter = f;
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelector(`.tab[onclick="setFilter('${f}')"]`).classList.add("active");
+    const tab = document.querySelector(`.tab[onclick="setFilter('${f}')"]`);
+    if (tab) tab.classList.add("active");
     renderPosts();
 }
 
@@ -915,11 +921,35 @@ function toggleEmojiPicker() {
 
     box.style.display = box.style.display === "block" ? "none" : "block";
 }
+
+/* =====================================================
+   🌗 THEME (sombre / clair)
+===================================================== */
+
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.classList.add('light');
+    } else {
+        document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+    const current = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+}
+
 /* =====================================================
    🚀 INITIALISATION AU DÉMARRAGE
 ===================================================== */
 
 window.onload = () => {
+    // Appliquer le thème sauvegardé (par défaut 'dark')
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
     if (localStorage.getItem("user")) {
         loadUserUI();
     }
@@ -949,4 +979,3 @@ window.onclick = function(e) {
 
 </body>
 </html>
-
