@@ -56,7 +56,6 @@ input, textarea {
     border: none;
     background: var(--bg2);
     color: var(--text);
-    box-sizing: border-box;
 }
 
 button {
@@ -223,54 +222,6 @@ button:hover {
     width: auto;
     flex: 1;
 }
-
-.filter-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.tab {
-    padding: 10px 20px;
-    background: var(--box);
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.tab:hover {
-    background: var(--accent);
-    transform: scale(1.05);
-}
-
-.tab.active {
-    background: var(--accent);
-    border-color: var(--accent2);
-    box-shadow: 0 0 15px var(--accent);
-}
-
-.search-box {
-    margin-bottom: 20px;
-}
-
-.emoji-picker {
-    display: none;
-    background: var(--box);
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 10px;
-}
-
-.delete {
-    background: #ff4444;
-}
-
-.delete:hover {
-    background: #ff0000;
-}
 </style>
 </head>
 <body>
@@ -333,15 +284,13 @@ button:hover {
 
 <!-- 👤 PROFIL UTILISATEUR -->
 <div id="profilePage" class="box" style="display:none;">
-    <h2>👤 Profil</h2>
-    <img id="profilePicture" class="pfp" style="width:80px;height:80px;margin-bottom:10px;">
+    <h2>Profil</h2>
+    <img id="profilePicture" class="pfp" style="width:80px;height:80px;">
     <input type="file" id="profileImageInput" accept="image/*" onchange="updateProfilePicture()">
     <p><b>Nom :</b> <span id="profileName"></span></p>
     <p><b>Posts :</b> <span id="profilePosts"></span></p>
-    <div id="profileExtra"></div>
     <button onclick="closeProfile()">Fermer</button>
 </div>
-
 <!-- 👑 PANEL ADMIN -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
@@ -357,7 +306,7 @@ button:hover {
         </div>
 
         <div style="margin-top:10px;margin-bottom:20px;font-size:13px;color:#aaa;">
-            ➜ L'admin peut créer / supprimer des badges personnalisés  
+            ➜ L’admin peut créer / supprimer des badges personnalisés  
             ➜ Les badges peuvent être donnés ou retirés aux utilisateurs
         </div>
 
@@ -372,26 +321,22 @@ button:hover {
 <div id="ticketModal" class="modal">
     <div class="modal-content">
         <h2>📨 Tickets de Support</h2>
-        
-        <div style="margin-bottom:20px;">
-            <textarea id="ticketMessage" placeholder="Explique ton problème..."></textarea>
-            <button onclick="sendTicket()">Envoyer un ticket</button>
-        </div>
+        <textarea id="ticketMessage" placeholder="Explique ton problème..."></textarea>
+        <button onclick="sendTicket()">Envoyer</button>
 
         <hr>
 
-        <h3>📋 Tous les tickets</h3>
+        <h3>📋 Tickets envoyés</h3>
         <div id="ticketsList"></div>
 
         <button onclick="closeTicketPanel()" style="margin-top:20px;">Fermer</button>
     </div>
 </div>
 
-<!-- 📨 BOUTON D'OUVERTURE TICKET -->
+<!-- 📨 BOUTON D’OUVERTURE TICKET -->
 <button onclick="openTicketPanel()" style="position:fixed;bottom:20px;right:20px;background:#4facfe;">
     📨 Support
 </button>
-
 <script>
 /* =====================================================
    🔐 CONSTANTES & HELPERS
@@ -421,7 +366,6 @@ function register() {
     let pass = password.value.trim();
 
     if (!user || !pass) return alert("Champs vides.");
-    if (pass.length < 4) return alert("Mot de passe trop court (min 4 caractères).");
 
     let users = getUsers();
     let usernames = Object.keys(users).map(u => u.toLowerCase());
@@ -433,16 +377,11 @@ function register() {
         pass, 
         pfp: "", 
         karma: 0, 
-        badges: [],
-        joinDate: Date.now()
+        badges: [] 
     };
 
     saveUsers(users);
     showNotification("✅ Compte créé avec succès !");
-    
-    // Connexion automatique
-    localStorage.setItem("user", user);
-    loadUserUI();
 }
 
 function login() {
@@ -467,18 +406,6 @@ function login() {
 function logout() {
     localStorage.removeItem("user");
     location.reload();
-}
-
-
-/* =====================================================
-   🌗 THÈME CLAIR/SOMBRE
-===================================================== */
-
-function toggleTheme() {
-    document.body.classList.toggle("light");
-    let theme = document.body.classList.contains("light") ? "light" : "dark";
-    localStorage.setItem("theme", theme);
-    showNotification(theme === "light" ? "☀️ Mode clair activé" : "🌙 Mode sombre activé");
 }
 
 
@@ -598,8 +525,8 @@ function openAdminPanel() {
             </div>
 
             <div>
-                <button onclick="resetPassword('${username}')" style="background:#4facfe;">🔑 Reset MDP</button>
-                <button class="delete" onclick="deleteUser('${username}')">🗑 Supprimer</button>
+                <button onclick="resetPassword('${username}')" style="background:#4facfe;">🔑 Reset</button>
+                <button class="delete" onclick="deleteUser('${username}')">🗑</button>
             </div>
         </div>`;
     }
@@ -660,20 +587,28 @@ function createCustomBadge() {
     openAdminPanel();
 }
 
+function deleteCustomBadge(name) {
+    if (!confirm("Supprimer ce badge personnalisé ?")) return;
+
+    let badges = getCustomBadges();
+    delete badges[name];
+    localStorage.setItem("customBadges", JSON.stringify(badges));
+
+    showNotification("❌ Badge supprimé.");
+    openAdminPanel();
+}
+
 
 /* =====================================================
-   🔑 RESET MOT DE PASSE (admin) - AMÉLIORÉ
+   🔑 RESET MOT DE PASSE (admin)
 ===================================================== */
 
 function resetPassword(username) {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-    
-    let newPass = prompt("Nouveau mot de passe pour " + username + " :");
+    let users = getUsers();
+    let newPass = prompt("Nouveau mot de passe pour " + username);
 
     if (!newPass) return;
-    if (newPass.length < 4) return alert("Mot de passe trop court (min 4 caractères).");
 
-    let users = getUsers();
     users[username].pass = newPass;
     saveUsers(users);
 
@@ -682,85 +617,41 @@ function resetPassword(username) {
 
 
 /* =====================================================
-   ❌ SUPPRESSION UTILISATEUR - AMÉLIORÉ
+   ❌ SUPPRESSION UTILISATEUR
 ===================================================== */
 
 function deleteUser(username) {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-    
-    if (!confirm(`⚠️ ATTENTION !\n\nSupprimer définitivement l'utilisateur "${username}" ?\n\n- Tous ses posts seront supprimés\n- Tous ses commentaires seront supprimés\n- Cette action est IRRÉVERSIBLE`)) return;
+    if (!confirm("Supprimer l'utilisateur ET tous ses posts ?")) return;
 
-    // Supprimer tous les posts de l'utilisateur
+    // Supprimer posts
     let posts = getPosts().filter(p => p.user !== username);
-    
-    // Supprimer tous les commentaires de l'utilisateur
-    posts = posts.map(p => {
-        p.comments = p.comments.filter(c => c.user !== username);
-        return p;
-    });
-    
     savePosts(posts);
 
-    // Supprimer tous les tickets de l'utilisateur
-    let tickets = getTickets().filter(t => t.user !== username);
-    saveTickets(tickets);
-
-    // Supprimer le compte
+    // Supprimer compte
     let users = getUsers();
     delete users[username];
     saveUsers(users);
 
-    showNotification(`🗑 Utilisateur "${username}" et tout son contenu supprimés !`);
+    showNotification(`🗑 Utilisateur ${username} supprimé.`);
     openAdminPanel();
 }
 
 
 /* =====================================================
-   📨 SYSTEME DE TICKETS (AMÉLIORÉ)
+   📨 SYSTEME DE TICKETS
 ===================================================== */
 
 function openTicketPanel() {
     let tickets = getTickets();
-    let user = localStorage.getItem("user");
-    let isAdmin = user === ADMIN_USER;
-    
     let html = "";
 
     tickets.forEach((t, i) => {
-        let statusClass = t.status === "resolved" ? "resolved" : "pending";
-        let statusText = t.status === "resolved" ? "✅ Résolu" : "⏳ En attente";
-        
         html += `
-        <div class="user-item" style="border-left:4px solid ${t.status === 'resolved' ? '#4caf50' : '#ff9800'};">
-            <div style="flex:1;">
-                <b>${t.user}</b> 
-                <span style="font-size:11px;color:#aaa;margin-left:10px;">${new Date(t.date).toLocaleString()}</span>
-                <br>
-                <span style="color:${t.status === 'resolved' ? '#4caf50' : '#ff9800'};">${statusText}</span>
-                <p style="margin:10px 0;">${t.msg}</p>
-                
-                ${t.response ? `
-                    <div style="background:var(--bg);padding:10px;border-radius:5px;margin-top:10px;">
-                        <b>Réponse admin :</b> ${t.response}
-                    </div>
-                ` : ""}
-                
-                ${isAdmin && t.status !== "resolved" ? `
-                    <textarea id="response-${i}" placeholder="Répondre au ticket..." style="width:100%;margin-top:10px;"></textarea>
-                    <button onclick="respondToTicket(${i})">📨 Répondre</button>
-                    <button onclick="resolveTicket(${i})" style="background:#4caf50;">✅ Marquer résolu</button>
-                ` : ""}
-            </div>
-            
-            <div>
-                ${(isAdmin || t.user === user) ? `
-                    <button class="delete" onclick="deleteTicket(${i})">🗑</button>
-                ` : ""}
-            </div>
+        <div class="user-item">
+            <b>${t.user}</b> : ${t.msg}
+            <button class="delete" onclick="deleteTicket(${i})">x</button>
         </div>`;
     });
-
-    if (!html) html = "<p style='text-align:center;color:#aaa;'>Aucun ticket pour le moment</p>";
 
     ticketsList.innerHTML = html;
     ticketModal.style.display = "flex";
@@ -775,61 +666,21 @@ function sendTicket() {
     if (!msg) return alert("Le message est vide.");
 
     let user = localStorage.getItem("user");
-    if (!user) return alert("Connecte-toi d'abord.");
-    
     let tickets = getTickets();
 
-    tickets.push({ 
-        user, 
-        msg, 
-        date: Date.now(),
-        status: "pending",
-        response: null
-    });
-    
+    tickets.push({ user, msg });
     saveTickets(tickets);
 
     ticketMessage.value = "";
     showNotification("📨 Ticket envoyé !");
-    openTicketPanel();
-}
-
-function respondToTicket(index) {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-    
-    let response = document.getElementById(`response-${index}`).value.trim();
-    if (!response) return alert("La réponse est vide.");
-    
-    let tickets = getTickets();
-    tickets[index].response = response;
-    saveTickets(tickets);
-    
-    showNotification("✅ Réponse envoyée !");
-    openTicketPanel();
-}
-
-function resolveTicket(index) {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-    
-    let tickets = getTickets();
-    tickets[index].status = "resolved";
-    saveTickets(tickets);
-    
-    showNotification("✅ Ticket marqué comme résolu !");
-    openTicketPanel();
 }
 
 function deleteTicket(i) {
-    if (!confirm("Supprimer ce ticket ?")) return;
-    
     let tickets = getTickets();
     tickets.splice(i, 1);
     saveTickets(tickets);
     openTicketPanel();
-    showNotification("🗑 Ticket supprimé !");
 }
-
-
 /* =====================================================
    📝 CRÉATION DE POST
 ===================================================== */
@@ -879,7 +730,7 @@ function savePost(content, img) {
 
 
 /* =====================================================
-   📝 AFFICHAGE DES POSTS - AMÉLIORÉ
+   📝 AFFICHAGE DES POSTS
 ===================================================== */
 
 function renderPosts() {
@@ -891,20 +742,10 @@ function renderPosts() {
     // Filtre recherche
     posts = posts.filter(p => p.content.toLowerCase().includes(query));
 
-    // Filtres par onglets (TOUS FONCTIONNELS)
-    if (filter === "top") {
-        posts.sort((a,b) => b.votes - a.votes);
-    }
-    else if (filter === "recent") {
-        posts.sort((a,b) => b.date - a.date);
-    }
-    else if (filter === "mine") {
-        posts = posts.filter(p => p.user === user);
-    }
-    else {
-        // "all" - tri par date décroissante par défaut
-        posts.sort((a,b) => b.date - a.date);
-    }
+    // Filtres par onglets
+    if (filter === "top") posts.sort((a,b) => b.votes - a.votes);
+    if (filter === "recent") posts.sort((a,b) => b.date - a.date);
+    if (filter === "mine") posts = posts.filter(p => p.user === user);
 
     let html = "";
 
@@ -913,4 +754,199 @@ function renderPosts() {
         let badges = p.anonymous ? "" : getBadgeHTML(p.user);
 
         let pfp = p.anonymous
-            ? "https://i.imgur.com/CJH0pCj.
+            ? "https://i.imgur.com/CJH0pCj.png"
+            : getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
+
+        html += `
+        <div class="post">
+            <div style="display:flex;align-items:center;margin-bottom:10px;">
+                <img class="pfp" src="${pfp}">
+                <b style="margin-left:10px;cursor:pointer;" onclick="openProfile('${p.user}')">
+                    ${displayUser}
+                </b>
+                ${badges}
+            </div>
+
+            <p>${p.content}</p>
+
+            ${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:8px;margin-top:10px;">` : ""}
+
+            <div style="margin-top:10px;">
+                <button class="vote-btn" onclick="vote(${p.id},1)">⬆</button>
+                ${p.votes}
+                <button class="vote-btn" onclick="vote(${p.id},-1)">⬇</button>
+
+                <button onclick="toggleComments(${p.id})">💬 Commentaires (${p.comments.length})</button>
+
+                ${(user === p.user || user === ADMIN_USER)
+                    ? `<button class="delete" onclick="deletePost(${p.id})">🗑</button>`
+                    : ""}
+            </div>
+
+            <!-- Commentaires -->
+            <div id="comments-${p.id}" style="display:none;margin-top:10px;">
+                <textarea id="comment-input-${p.id}" placeholder="Ajouter un commentaire..."></textarea>
+                <button onclick="addComment(${p.id})">Publier</button>
+                <div id="comment-list-${p.id}">
+                    ${renderCommentsHTML(p)}
+                </div>
+            </div>
+        </div>`;
+    });
+
+    postsContainer.innerHTML = html;
+}
+
+function renderCommentsHTML(post) {
+    let user = localStorage.getItem("user");
+
+    return post.comments.map((c,i) => `
+        <div class="comment">
+            <b>${c.user}</b> : ${c.text}
+            ${(c.user === user || user === ADMIN_USER)
+                ? `<button class="delete" onclick="deleteComment(${post.id},${i})">x</button>`
+                : ""}
+        </div>
+    `).join("");
+}
+
+
+/* =====================================================
+   🔼🔽 VOTES
+===================================================== */
+
+function vote(id, val) {
+    let posts = getPosts();
+    let p = posts.find(x => x.id === id);
+    if (!p) return;
+
+    p.votes += val;
+    savePosts(posts);
+    renderPosts();
+}
+
+
+/* =====================================================
+   💬 COMMENTAIRES
+===================================================== */
+
+function toggleComments(id) {
+    let box = document.getElementById("comments-" + id);
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function addComment(id) {
+    let posts = getPosts();
+    let p = posts.find(x => x.id === id);
+    if (!p) return;
+
+    let text = document.getElementById("comment-input-" + id).value.trim();
+    if (!text) return;
+
+    p.comments.push({
+        user: localStorage.getItem("user"),
+        text
+    });
+
+    savePosts(posts);
+    renderPosts();
+}
+
+function deleteComment(postId, index) {
+    let posts = getPosts();
+    let p = posts.find(x => x.id === postId);
+    p.comments.splice(index, 1);
+    savePosts(posts);
+    renderPosts();
+}
+
+
+/* =====================================================
+   ❌ SUPPRESSION POST
+===================================================== */
+
+function deletePost(id) {
+    if (!confirm("Supprimer ce post ?")) return;
+
+    let posts = getPosts().filter(p => p.id !== id);
+    savePosts(posts);
+    renderPosts();
+}
+
+
+/* =====================================================
+   🔍 RECHERCHE + FILTRES
+===================================================== */
+
+let currentFilter = "all";
+
+function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelector(`.tab[onclick="setFilter('${f}')"]`).classList.add("active");
+    renderPosts();
+}
+
+function filterPosts() {
+    renderPosts();
+}
+
+
+/* =====================================================
+   😊 EMOJI PICKER
+===================================================== */
+
+const emojis = ["😀","😁","😂","🤣","😅","😊","😍","😘","😎","🤔","😢","😭","😡","👍","🔥","⭐","💀","💎","❤️"];
+
+function toggleEmojiPicker() {
+    let box = document.getElementById("emojiPicker");
+
+    if (!box.innerHTML.trim()) {
+        emojis.forEach(e => {
+            let btn = document.createElement("button");
+            btn.textContent = e;
+            btn.style.margin = "5px";
+            btn.onclick = () => {
+                postContent.value += e;
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    box.style.display = box.style.display === "block" ? "none" : "block";
+}
+/* =====================================================
+   🚀 INITIALISATION AU DÉMARRAGE
+===================================================== */
+
+window.onload = () => {
+    if (localStorage.getItem("user")) {
+        loadUserUI();
+    }
+    renderPosts();
+};
+
+
+/* =====================================================
+   ❌ FERMETURE DES MODALS
+===================================================== */
+
+function closeAdminPanel() {
+    adminModal.style.display = "none";
+}
+
+function closeTicketPanel() {
+    ticketModal.style.display = "none";
+}
+
+
+/* Fermeture modals si clic extérieur */
+window.onclick = function(e) {
+    if (e.target === adminModal) adminModal.style.display = "none";
+    if (e.target === ticketModal) ticketModal.style.display = "none";
+};
+</script>
+
+</body>
+</html>
+
