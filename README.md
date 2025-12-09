@@ -235,11 +235,12 @@ button:hover {
 </div>
 
 <!-- 🧭 ONGLET DE FILTRES -->
-<div class="filter-tabs" id="filterTabs" style="display:none;">
-    <div class="tab active" onclick="setFilter('all')">🌟 Tous</div>
-    <div class="tab" onclick="setFilter('top')">🔥 Populaires</div>
-    <div class="tab" onclick="setFilter('recent')">⏰ Récents</div>
-    <div class="tab" onclick="setFilter('mine')">👤 Mes posts</div>
+<!-- rendu visible par défaut pour permettre la navigation sans être connecté -->
+<div class="filter-tabs" id="filterTabs" style="display:flex;">
+    <div class="tab active" data-filter="all">🌟 Tous</div>
+    <div class="tab" data-filter="top">🔥 Populaires</div>
+    <div class="tab" data-filter="recent">⏰ Récents</div>
+    <div class="tab" data-filter="mine">👤 Mes posts</div>
 </div>
 
 <!-- 🔐 AUTHENTIFICATION -->
@@ -340,14 +341,37 @@ button:hover {
 <script>
 /* =====================================================
    🔐 CONSTANTES & HELPERS
+   Instanciation explicite des éléments DOM critiques
 ===================================================== */
 
 const ADMIN_USER = "Admin";
 const ADMIN_PASS = "M@tteo2007_";
 
-// Références DOM explicites (fixe le problème "posts non affichés")
 const searchInput = document.getElementById('searchInput');
 const postsContainer = document.getElementById('posts');
+
+const authBox = document.getElementById('authBox');
+const userBox = document.getElementById('userBox');
+const postBox = document.getElementById('postBox');
+const filterTabs = document.getElementById('filterTabs');
+
+const currentUser = document.getElementById('currentUser');
+const adminPanel = document.getElementById('adminPanel');
+const userPfp = document.getElementById('userPfp');
+
+const profilePage = document.getElementById('profilePage');
+const profilePicture = document.getElementById('profilePicture');
+const profileName = document.getElementById('profileName');
+const profilePosts = document.getElementById('profilePosts');
+const profileImageInput = document.getElementById('profileImageInput');
+
+const ticketsList = document.getElementById('ticketsList');
+const usersList = document.getElementById('usersList');
+const ticketMessage = document.getElementById('ticketMessage');
+
+const postContent = document.getElementById('postContent');
+const postImage = document.getElementById('postImage');
+const anonymousMode = document.getElementById('anonymousMode');
 
 function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
 function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
@@ -430,6 +454,8 @@ function loadUserUI() {
 
     if (user === ADMIN_USER)
         adminPanel.style.display = "inline-block";
+    else
+        adminPanel.style.display = "none";
 
     let users = getUsers();
 
@@ -690,6 +716,8 @@ function deleteTicket(i) {
 ===================================================== */
 
 function addPost() {
+    if (!localStorage.getItem('user')) return alert("Tu dois être connecté pour poster.");
+
     let content = postContent.value.trim();
     if (!content) return alert("Le post est vide.");
 
@@ -753,50 +781,54 @@ function renderPosts() {
 
     let html = "";
 
-    posts.forEach(p => {
-        let displayUser = p.anonymous ? "Anonyme" : p.user;
-        let badges = p.anonymous ? "" : getBadgeHTML(p.user);
+    if (posts.length === 0) {
+        html = '<div class="box">Aucun post pour le moment.</div>';
+    } else {
+        posts.forEach(p => {
+            let displayUser = p.anonymous ? "Anonyme" : p.user;
+            let badges = p.anonymous ? "" : getBadgeHTML(p.user);
 
-        let pfp = p.anonymous
-            ? "https://i.imgur.com/CJH0pCj.png"
-            : (getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
+            let pfp = p.anonymous
+                ? "https://i.imgur.com/CJH0pCj.png"
+                : (getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
 
-        html += `
-        <div class="post">
-            <div style="display:flex;align-items:center;margin-bottom:10px;">
-                <img class="pfp" src="${pfp}">
-                <b style="margin-left:10px;cursor:pointer;" onclick="openProfile('${p.user}')">
-                    ${displayUser}
-                </b>
-                ${badges}
-            </div>
-
-            <p>${p.content}</p>
-
-            ${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:8px;margin-top:10px;">` : ""}
-
-            <div style="margin-top:10px;">
-                <button class="vote-btn" onclick="vote(${p.id},1)">⬆</button>
-                ${p.votes}
-                <button class="vote-btn" onclick="vote(${p.id},-1)">⬇</button>
-
-                <button onclick="toggleComments(${p.id})">💬 Commentaires (${p.comments.length})</button>
-
-                ${(user === p.user || user === ADMIN_USER)
-                    ? `<button class="delete" onclick="deletePost(${p.id})">🗑</button>`
-                    : ""}
-            </div>
-
-            <!-- Commentaires -->
-            <div id="comments-${p.id}" style="display:none;margin-top:10px;">
-                <textarea id="comment-input-${p.id}" placeholder="Ajouter un commentaire..."></textarea>
-                <button onclick="addComment(${p.id})">Publier</button>
-                <div id="comment-list-${p.id}">
-                    ${renderCommentsHTML(p)}
+            html += `
+            <div class="post">
+                <div style="display:flex;align-items:center;margin-bottom:10px;">
+                    <img class="pfp" src="${pfp}">
+                    <b style="margin-left:10px;cursor:pointer;" onclick="openProfile('${p.user}')">
+                        ${displayUser}
+                    </b>
+                    ${badges}
                 </div>
-            </div>
-        </div>`;
-    });
+
+                <p>${p.content}</p>
+
+                ${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:8px;margin-top:10px;">` : ""}
+
+                <div style="margin-top:10px;">
+                    <button class="vote-btn" onclick="vote(${p.id},1)">⬆</button>
+                    ${p.votes}
+                    <button class="vote-btn" onclick="vote(${p.id},-1)">⬇</button>
+
+                    <button onclick="toggleComments(${p.id})">💬 Commentaires (${p.comments.length})</button>
+
+                    ${(user === p.user || user === ADMIN_USER)
+                        ? `<button class="delete" onclick="deletePost(${p.id})">🗑</button>`
+                        : ""}
+                </div>
+
+                <!-- Commentaires -->
+                <div id="comments-${p.id}" style="display:none;margin-top:10px;">
+                    <textarea id="comment-input-${p.id}" placeholder="Ajouter un commentaire..."></textarea>
+                    <button onclick="addComment(${p.id})">Publier</button>
+                    <div id="comment-list-${p.id}">
+                        ${renderCommentsHTML(p)}
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
 
     if (postsContainer) postsContainer.innerHTML = html;
 }
@@ -841,6 +873,8 @@ function toggleComments(id) {
 }
 
 function addComment(id) {
+    if (!localStorage.getItem('user')) return alert("Tu dois être connecté pour commenter.");
+
     let posts = getPosts();
     let p = posts.find(x => x.id === id);
     if (!p) return;
@@ -888,7 +922,7 @@ let currentFilter = "all";
 function setFilter(f) {
     currentFilter = f;
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    const tab = document.querySelector(`.tab[onclick="setFilter('${f}')"]`);
+    const tab = Array.from(document.querySelectorAll(".tab")).find(t => t.getAttribute('data-filter') === f);
     if (tab) tab.classList.add("active");
     renderPosts();
 }
@@ -942,6 +976,59 @@ function toggleTheme() {
 }
 
 /* =====================================================
+   👤 PROFIL — ouverture et update photo
+===================================================== */
+
+function openProfile(username) {
+    if (!username) return;
+    const users = getUsers();
+    const u = users[username] || {};
+
+    profileName.textContent = username;
+    profilePicture.src = u.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
+
+    // nombre de posts
+    const posts = getPosts().filter(p => p.user === username);
+    profilePosts.textContent = posts.length;
+
+    // si on regarde son propre profil, autoriser l'upload
+    if (localStorage.getItem('user') === username) {
+        profileImageInput.style.display = "block";
+    } else {
+        profileImageInput.style.display = "none";
+    }
+
+    profilePage.style.display = "block";
+}
+
+function closeProfile() {
+    profilePage.style.display = "none";
+}
+
+function updateProfilePicture() {
+    const file = profileImageInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        const data = reader.result;
+        const username = localStorage.getItem('user');
+        if (!username) return alert("Tu dois être connecté pour changer la photo.");
+
+        const users = getUsers();
+        users[username] = users[username] || { pass: "", pfp: "", karma:0, badges: [] };
+        users[username].pfp = data;
+        saveUsers(users);
+
+        // mise à jour UI
+        profilePicture.src = data;
+        userPfp.src = data;
+        showNotification("✅ Photo de profil mise à jour !");
+        renderPosts();
+    };
+    reader.readAsDataURL(file);
+}
+
+/* =====================================================
    🚀 INITIALISATION AU DÉMARRAGE
 ===================================================== */
 
@@ -950,6 +1037,15 @@ window.onload = () => {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
+    // Configurer écouteurs des onglets (utiliser data-filter)
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const f = tab.getAttribute('data-filter');
+            setFilter(f);
+        });
+    });
+
+    // Afficher l'UI utilisateur si connecté
     if (localStorage.getItem("user")) {
         loadUserUI();
     }
