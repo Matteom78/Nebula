@@ -300,12 +300,13 @@ button:hover {
 
         <div style="margin-top:12px;">
             <h3>Badges personnalisés</h3>
-            <div class="custom-badge-form">
+            <div class="custom-badge-form" style="display:flex;gap:8px;align-items:center;">
                 <input type="text" id="customBadgeName" placeholder="Nom du badge">
                 <input type="text" id="customBadgeIcon" placeholder="Icône (emoji)">
                 <input type="color" id="customBadgeColor" value="#ff0000">
                 <button onclick="createCustomBadge()">Créer</button>
             </div>
+            <div id="customBadgesList" style="margin-top:10px;"></div>
         </div>
 
         <button onclick="closeAdminPanel()" style="margin-top:12px;">Fermer</button>
@@ -526,6 +527,7 @@ function getBadgeHTML(username) {
 /* =====================================================
    Admin: users list, delete user, reset password
    - delete removes user, all posts, all comments by user, and user's tickets
+   - also renders and manages custom badges
 ===================================================== */
 
 function openAdminPanel() {
@@ -533,6 +535,7 @@ function openAdminPanel() {
     const users = getUsers();
     const custom = getCustomBadges();
 
+    // Users list
     let html = '';
     for (let uname in users) {
         if (uname === ADMIN_USER) continue;
@@ -552,6 +555,29 @@ function openAdminPanel() {
         </div>`;
     }
     usersList.innerHTML = html;
+
+    // Custom badges list (editable)
+    const customListEl = document.getElementById('customBadgesList');
+    let cbHtml = '';
+    const customKeys = Object.keys(custom || {});
+    if (customKeys.length === 0) {
+        cbHtml = '<div class="small">Aucun badge personnalisé</div>';
+    } else {
+        customKeys.forEach(cb => {
+            const b = custom[cb];
+            cbHtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;border:1px solid var(--border);margin-bottom:6px;border-radius:8px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="badge" style="background:${b.color};padding:6px 10px;">${b.icon || ''} ${cb}</div>
+                    <div class="small">${b.color}</div>
+                </div>
+                <div>
+                    <button onclick="deleteCustomBadge('${cb}')" style="background:var(--danger)">Supprimer</button>
+                </div>
+            </div>`;
+        });
+    }
+    customListEl.innerHTML = cbHtml;
+
     document.getElementById('adminModal').style.display = 'flex';
 }
 
@@ -597,6 +623,48 @@ function deleteUser(username) {
     saveUsers(users);
 
     showNotification(`🗑 Utilisateur ${username} et tout son contenu supprimé.`);
+    openAdminPanel();
+}
+
+/* =====================================================
+   Custom badges management
+   createCustomBadge() and deleteCustomBadge(name)
+===================================================== */
+
+function createCustomBadge() {
+    if (localStorage.getItem('user') !== ADMIN_USER) return alert("Accès admin requis.");
+    const nameEl = document.getElementById('customBadgeName');
+    const iconEl = document.getElementById('customBadgeIcon');
+    const colorEl = document.getElementById('customBadgeColor');
+
+    const name = (nameEl && nameEl.value || '').trim();
+    const icon = (iconEl && iconEl.value || '').trim();
+    const color = (colorEl && colorEl.value) || '#ff0000';
+
+    if (!name) return alert('Nom de badge vide.');
+
+    const badges = getCustomBadges();
+    if (badges[name]) return alert('Un badge avec ce nom existe déjà.');
+
+    badges[name] = { icon, color };
+    localStorage.setItem('customBadges', JSON.stringify(badges));
+
+    // reset inputs
+    if (nameEl) nameEl.value = '';
+    if (iconEl) iconEl.value = '';
+    if (colorEl) colorEl.value = '#ff0000';
+
+    showNotification(`🎖 Badge personnalisé "${name}" créé !`);
+    openAdminPanel();
+}
+
+function deleteCustomBadge(name) {
+    if (localStorage.getItem('user') !== ADMIN_USER) return alert("Accès admin requis.");
+    if (!confirm(`Supprimer le badge personnalisé "${name}" ?`)) return;
+    const badges = getCustomBadges();
+    delete badges[name];
+    localStorage.setItem('customBadges', JSON.stringify(badges));
+    showNotification(`❌ Badge "${name}" supprimé.`);
     openAdminPanel();
 }
 
