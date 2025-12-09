@@ -12,6 +12,10 @@
     --accent2: #ff4cff;
     --box: #1b1f3b;
     --border: #2a2e52;
+    --muted: #9aa0c7;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f39c12;
 }
 
 .light {
@@ -22,21 +26,26 @@
     --accent2: #ff4cff;
     --box: #e6e6e6;
     --border: #cccccc;
+    --muted: #666;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f39c12;
 }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: Arial;
+    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 20px;
 }
 
 h1 {
     text-align: center;
-    font-size: 38px;
+    font-size: 36px;
     color: var(--accent2);
-    text-shadow: 0 0 20px var(--accent);
+    text-shadow: 0 0 18px var(--accent);
+    margin-bottom: 12px;
 }
 
 .box {
@@ -45,15 +54,15 @@ h1 {
     border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 20px;
-    box-shadow: 0 0 15px #0005;
+    box-shadow: 0 0 12px #0004;
 }
 
 input, textarea {
     width: 100%;
     padding: 10px;
-    margin-top: 10px;
+    margin-top: 8px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid var(--border);
     background: var(--bg2);
     color: var(--text);
 }
@@ -61,51 +70,73 @@ input, textarea {
 button {
     background: var(--accent);
     border: none;
-    padding: 10px 18px;
-    margin-top: 10px;
+    padding: 8px 14px;
+    margin-top: 8px;
     border-radius: 8px;
     cursor: pointer;
     color: white;
-    transition: 0.2s;
+    transition: 0.14s;
+    font-weight: 600;
 }
 
 button:hover {
     background: var(--accent2);
-    transform: scale(1.05);
-    box-shadow: 0 0 20px var(--accent2);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px #0008;
 }
 
 .post {
-    background: var(--box);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 14px;
     border-left: 4px solid var(--accent);
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .post:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 25px #0007;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px #0008;
+}
+
+.vote-btn {
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-right: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .vote-btn:hover {
+    background: rgba(255,255,255,0.03);
     color: var(--accent2);
 }
 
 .pfp {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid var(--border);
+}
+
+.post-meta {
+    display:flex;
+    gap:10px;
+    align-items:center;
+    color:var(--muted);
+    font-size:13px;
 }
 
 .comment {
     background: var(--bg2);
     padding: 10px;
-    border-radius: 7px;
-    margin-top: 5px;
+    border-radius: 8px;
+    margin-top: 8px;
+    color: var(--text);
 }
 
 .notification {
@@ -114,120 +145,63 @@ button:hover {
     right: 20px;
     background: var(--accent);
     color: white;
-    padding: 15px 20px;
+    padding: 12px 16px;
     border-radius: 8px;
     box-shadow: 0 5px 20px #0007;
-    animation: slideIn 0.3s;
+    animation: slideIn 0.28s;
     z-index: 1000;
 }
 
 @keyframes slideIn {
-    from { transform: translateX(400px); opacity: 0; }
+    from { transform: translateX(300px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
 
+/* Badges */
 .badge {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 3px 8px;
     border-radius: 12px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-left: 5px;
-    vertical-align: middle;
-}
-
-.badge-admin {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 0 10px #667eea;
-}
-
-.badge-vip {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-}
-
-.badge-verified {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
-
-.badge-star {
-    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-    color: white;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: var(--box);
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    border: 2px solid var(--accent);
-}
-
-.user-item {
-    background: var(--bg2);
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.badge-selector {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.badge-option {
-    padding: 5px 10px;
-    border-radius: 15px;
-    cursor: pointer;
     font-size: 12px;
-    transition: 0.2s;
-    border: 2px solid transparent;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+    color: white;
 }
 
-.badge-option:hover {
-    transform: scale(1.1);
-    border-color: var(--accent);
+.badge-admin { background: linear-gradient(135deg,#667eea,#764ba2); box-shadow: 0 0 12px #667eea;}
+.badge-vip { background: linear-gradient(135deg,#f093fb,#f5576c); }
+.badge-verified { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+.badge-star { background: linear-gradient(135deg,#ffd89b,#19547b); }
+
+/* Tickets */
+.ticket-item {
+    background: var(--box);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent);
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
 }
 
-.custom-badge-form {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
+.ticket-meta { font-size:12px; color:var(--muted); }
 
-.custom-badge-form input {
-    width: auto;
-    flex: 1;
-}
+.ticket-status.open { color: var(--warning); font-weight:700; }
+.ticket-status.resolved { color: var(--success); font-weight:700; }
 
-/* Profile modal specific */
-#profilePage img.pfp { width: 80px; height: 80px; margin-bottom: 10px; }
-#profileControls { margin-top: 10px; display:flex; gap:8px; align-items:center; }
+/* profile preview */
 #profilePreview { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
-#saveProfileImage, #cancelProfileImage { display:none; }
+
+/* small UI tweaks */
+.small { font-size:12px; color:var(--muted); }
+.align-right { margin-left:auto; }
+
+/* responsive */
+@media (max-width:600px) {
+    .post-meta { flex-wrap:wrap; gap:6px; }
+}
 </style>
 </head>
 <body>
@@ -235,132 +209,136 @@ button:hover {
 <h1>🌌 NEBULA – Reddit Cosmique</h1>
 <button class="theme-btn" onclick="toggleTheme()" style="position:fixed;top:20px;right:20px;">🌗 Mode Sombre / Clair</button>
 
-<!-- 🔍 BARRE DE RECHERCHE -->
-<div class="search-box">
+<!-- Search -->
+<div class="search-box box">
     <input id="searchInput" placeholder="🔍 Rechercher des posts..." oninput="filterPosts()">
 </div>
 
-<!-- 🧭 ONGLET DE FILTRES -->
-<div class="filter-tabs" id="filterTabs" style="display:flex;">
-    <div class="tab active" data-filter="all">🌟 Tous</div>
-    <div class="tab" data-filter="top">🔥 Populaires</div>
-    <div class="tab" data-filter="recent">⏰ Récents</div>
-    <div class="tab" data-filter="mine">👤 Mes posts</div>
+<!-- Filter tabs -->
+<div class="filter-tabs box" id="filterTabs" style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div class="tab active" data-filter="all" onclick="setFilter('all')">🌟 Tous</div>
+    <div class="tab" data-filter="top" onclick="setFilter('top')">🔥 Populaires</div>
+    <div class="tab" data-filter="recent" onclick="setFilter('recent')">⏰ Récents</div>
+    <div class="tab" data-filter="mine" onclick="setFilter('mine')">👤 Mes posts</div>
 </div>
 
-<!-- 🔐 AUTHENTIFICATION -->
+<!-- Auth box -->
 <div id="authBox" class="box">
     <h3>Connexion / Inscription</h3>
     <input id="username" placeholder="Nom d'utilisateur">
-    <input id="password" type="password" placeholder="Mot de passe">
-    <button onclick="register()">Créer un compte</button>
-    <button onclick="login()">Connexion</button>
+    <input id="password" type="password" placeholder="Mot de passe (min 4 caractères)">
+    <div style="display:flex;gap:8px">
+        <button onclick="register()">Créer un compte</button>
+        <button onclick="login()">Connexion</button>
+    </div>
+    <div class="small" style="margin-top:8px;color:var(--muted)">Après inscription, connexion automatique.</div>
 </div>
 
-<!-- 👤 ESPACE UTILISATEUR -->
+<!-- User area -->
 <div id="userBox" class="box" style="display:none;">
     <img id="userPfp" class="pfp" src="">
     Connecté en tant que : <b id="currentUser"></b>
-    <button id="myProfileBtn" onclick="openProfile()" >Mon Profil</button>
-    <button id="adminPanel" onclick="openAdminPanel()" style="display:none;background:#764ba2;">👑 Panel Admin</button>
-    <button onclick="logout()">Se déconnecter</button>
+    <button id="myProfileBtn" onclick="openProfile()" style="margin-left:8px;">Mon Profil</button>
+    <button id="adminPanelBtn" onclick="openAdminPanel()" style="display:none;background:#764ba2;margin-left:8px;">👑 Panel Admin</button>
+    <button onclick="logout()" style="margin-left:8px;background:#e74c3c;">Se déconnecter</button>
 </div>
 
-<!-- ✏️ CRÉATION DE POST -->
+<!-- New post -->
 <div id="postBox" class="box" style="display:none;">
     <h3>Nouveau post</h3>
     <textarea id="postContent" placeholder="Écris quelque chose..."></textarea>
 
-    <!-- 😊 EMOJIS -->
-    <button onclick="toggleEmojiPicker()" style="background:transparent;color:var(--text);font-size:20px;padding:5px;">😊</button>
-    <div id="emojiPicker" class="emoji-picker"></div>
-
-    <!-- 👤 ANONYME -->
-    <label><input type="checkbox" id="anonymousMode"> Poster en anonyme</label>
-
-    <!-- 🖼 IMAGE -->
-    <input type="file" id="postImage" accept="image/*">
-
-    <!-- 🚀 PUBLIE -->
-    <button onclick="addPost()">Publier</button>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <label style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="anonymousMode"> Poster en anonyme
+        </label>
+        <input type="file" id="postImage" accept="image/*" style="flex:1">
+        <button onclick="addPost()">Publier</button>
+    </div>
 </div>
 
-<!-- 📄 ZONE DES POSTS -->
+<!-- Posts container -->
 <div id="posts"></div>
 
-<!-- 👤 PROFIL UTILISATEUR -->
-<div id="profilePage" class="box" style="display:none;">
+<!-- Profile modal -->
+<div id="profilePage" class="box" style="display:none;position:relative;">
     <h2>Profil</h2>
-    <img id="profilePicture" class="pfp" src="">
-    <div id="profileControls">
-        <!-- Hidden file input used to pick image -->
-        <input type="file" id="profileImageInput" accept="image/*" style="display:none;">
-        <!-- Visible preview and buttons -->
-        <img id="profilePreview" src="" alt="Prévisualisation" style="display:none;">
-        <div style="flex:1">
+    <div style="display:flex;gap:12px;align-items:center;">
+        <img id="profilePicture" class="pfp" src="">
+        <div>
             <p><b>Nom :</b> <span id="profileName"></span></p>
-            <p><b>Posts :</b> <span id="profilePosts"></span></p>
+            <p><b>Karma :</b> <span id="profileKarma"></span> • <b>Posts :</b> <span id="profilePosts"></span></p>
+            <p class="small"><b>Inscrit le :</b> <span id="profileSince"></span></p>
+            <div id="profileBadges"></div>
         </div>
-        <div id="profileButtons">
-            <!-- shown only when viewing own profile -->
-            <button id="changeProfileBtn" onclick="triggerProfileImagePick()" style="display:none;">Changer la photo</button>
-            <button id="saveProfileImage" onclick="saveProfileImage()" style="display:none;">Enregistrer</button>
-            <button id="cancelProfileImage" onclick="cancelProfileImage()" style="display:none;">Annuler</button>
+        <div class="align-right" style="margin-left:auto;text-align:right">
+            <img id="profilePreview" src="" style="display:none;">
+            <div style="margin-top:8px">
+                <button id="changeProfileBtn" onclick="triggerProfileImagePick()" style="display:none;">Changer la photo</button>
+                <button id="saveProfileImage" onclick="saveProfileImage()" style="display:none;">Enregistrer</button>
+                <button id="cancelProfileImage" onclick="cancelProfileImage()" style="display:none;">Annuler</button>
+            </div>
         </div>
     </div>
-    <button onclick="closeProfile()">Fermer</button>
+
+    <!-- hidden input for profile image -->
+    <input type="file" id="profileImageInput" accept="image/*" style="display:none;">
+
+    <button onclick="closeProfile()" style="margin-top:12px;">Fermer</button>
 </div>
 
-<!-- 👑 PANEL ADMIN -->
-<div id="adminModal" class="modal">
-    <div class="modal-content">
+<!-- Admin modal -->
+<div id="adminModal" class="modal" style="display:none;align-items:flex-start;">
+    <div class="modal-content box" style="max-width:900px;">
         <h2>👑 Panel Admin</h2>
-        <p>Gestion des utilisateurs, badges et outils admin</p>
+        <p class="small">Gestion des utilisateurs, badges, tickets et moderation</p>
 
-        <!-- ⭐ CRÉATION DE BADGE PERSONNALISÉ -->
-        <div class="custom-badge-form">
-            <input type="text" id="customBadgeName" placeholder="Nom du badge">
-            <input type="text" id="customBadgeIcon" placeholder="Icône (emoji)">
-            <input type="color" id="customBadgeColor" value="#ff0000">
-            <button onclick="createCustomBadge()">Créer</button>
+        <div style="margin-top:12px;">
+            <h3>Utilisateurs</h3>
+            <div id="usersList"></div>
         </div>
 
-        <div style="margin-top:10px;margin-bottom:20px;font-size:13px;color:#aaa;">
-            ➜ L’admin peut créer / supprimer des badges personnalisés  
-            ➜ Les badges peuvent être donnés ou retirés aux utilisateurs
+        <div style="margin-top:12px;">
+            <h3>Badges personnalisés</h3>
+            <div class="custom-badge-form">
+                <input type="text" id="customBadgeName" placeholder="Nom du badge">
+                <input type="text" id="customBadgeIcon" placeholder="Icône (emoji)">
+                <input type="color" id="customBadgeColor" value="#ff0000">
+                <button onclick="createCustomBadge()">Créer</button>
+            </div>
         </div>
 
-        <!-- 👥 LISTE UTILISATEURS -->
-        <div id="usersList"></div>
-
-        <button onclick="closeAdminPanel()" style="margin-top:20px;">Fermer</button>
+        <button onclick="closeAdminPanel()" style="margin-top:12px;">Fermer</button>
     </div>
 </div>
 
-<!-- 📨 MODAL TICKETS -->
-<div id="ticketModal" class="modal">
-    <div class="modal-content">
+<!-- Ticket modal -->
+<div id="ticketModal" class="modal" style="display:none;align-items:flex-start;">
+    <div class="modal-content box" style="max-width:900px;">
         <h2>📨 Tickets de Support</h2>
-        <textarea id="ticketMessage" placeholder="Explique ton problème..."></textarea>
-        <button onclick="sendTicket()">Envoyer</button>
+
+        <div style="display:flex;gap:8px;align-items:center">
+            <textarea id="ticketMessage" placeholder="Explique ton problème..." style="flex:1"></textarea>
+            <button onclick="sendTicket()">Envoyer</button>
+        </div>
 
         <hr>
 
         <h3>📋 Tickets envoyés</h3>
         <div id="ticketsList"></div>
 
-        <button onclick="closeTicketPanel()" style="margin-top:20px;">Fermer</button>
+        <button onclick="closeTicketPanel()" style="margin-top:12px;">Fermer</button>
     </div>
 </div>
 
-<!-- 📨 BOUTON D’OUVERTURE TICKET -->
-<button onclick="openTicketPanel()" style="position:fixed;bottom:20px;right:20px;background:#4facfe;">
+<!-- Support button -->
+<button onclick="openTicketPanel()" style="position:fixed;bottom:20px;right:20px;background:#4facfe;padding:10px;border-radius:12px;">
     📨 Support
 </button>
+
 <script>
 /* =====================================================
-   🔐 CONSTANTES & HELPERS
-   + DOM references
+   Constants & DOM refs
 ===================================================== */
 
 const ADMIN_USER = "Admin";
@@ -375,7 +353,7 @@ const postBox = document.getElementById('postBox');
 const filterTabs = document.getElementById('filterTabs');
 
 const currentUser = document.getElementById('currentUser');
-const adminPanel = document.getElementById('adminPanel');
+const adminPanelBtn = document.getElementById('adminPanelBtn');
 const userPfp = document.getElementById('userPfp');
 const myProfileBtn = document.getElementById('myProfileBtn');
 
@@ -383,6 +361,10 @@ const profilePage = document.getElementById('profilePage');
 const profilePicture = document.getElementById('profilePicture');
 const profileName = document.getElementById('profileName');
 const profilePosts = document.getElementById('profilePosts');
+const profileKarma = document.getElementById('profileKarma');
+const profileSince = document.getElementById('profileSince');
+const profileBadges = document.getElementById('profileBadges');
+
 const profileImageInput = document.getElementById('profileImageInput');
 const profilePreview = document.getElementById('profilePreview');
 const changeProfileBtn = document.getElementById('changeProfileBtn');
@@ -397,8 +379,9 @@ const postContent = document.getElementById('postContent');
 const postImage = document.getElementById('postImage');
 const anonymousMode = document.getElementById('anonymousMode');
 
-let stagedProfileImageData = null; // temp storage for preview before save
+let stagedProfileImageData = null;
 
+/* Storage helpers */
 function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
 function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
 
@@ -410,37 +393,63 @@ function saveTickets(t) { localStorage.setItem("tickets", JSON.stringify(t)); }
 
 function getCustomBadges() { return JSON.parse(localStorage.getItem("customBadges") || "{}"); }
 
+/* =====================================================
+   Utility: time ago & format date
+===================================================== */
+function timeAgo(ts) {
+    if (!ts) return "";
+    const d = Math.floor((Date.now() - ts) / 1000);
+    if (d < 10) return "À l'instant";
+    if (d < 60) return `${d} s`;
+    if (d < 3600) return `${Math.floor(d/60)} min`;
+    if (d < 86400) return `${Math.floor(d/3600)} h`;
+    if (d < 604800) return `${Math.floor(d/86400)} j`;
+    const dt = new Date(ts);
+    return dt.toLocaleString();
+}
+function formatDate(ts) {
+    if (!ts) return "";
+    const dt = new Date(ts);
+    return dt.toLocaleString();
+}
 
 /* =====================================================
-   🔐 AUTHENTIFICATION
+   Authentication (register/login/logout)
+   - password min 4 chars
+   - set createdAt date
+   - auto-login after registration
 ===================================================== */
 
 function register() {
-    let user = username.value.trim();
-    let pass = password.value.trim();
+    const user = username.value.trim();
+    const pass = password.value.trim();
 
     if (!user || !pass) return alert("Champs vides.");
+    if (pass.length < 4) return alert("Mot de passe trop court (min 4 caractères).");
 
-    let users = getUsers();
-    let usernames = Object.keys(users).map(u => u.toLowerCase());
+    const users = getUsers();
+    const usernames = Object.keys(users).map(u => u.toLowerCase());
+    if (usernames.includes(user.toLowerCase())) return alert("Nom d'utilisateur déjà pris.");
 
-    if (usernames.includes(user.toLowerCase()))  
-        return alert("Nom d'utilisateur déjà pris.");
-
-    users[user] = { 
-        pass, 
-        pfp: "", 
-        karma: 0, 
-        badges: [] 
+    users[user] = {
+        pass,
+        pfp: "",
+        karma: 0,
+        badges: [],
+        createdAt: Date.now()
     };
 
     saveUsers(users);
-    showNotification("✅ Compte créé avec succès !");
+
+    // Auto login
+    localStorage.setItem('user', user);
+    loadUserUI();
+    showNotification("✅ Compte créé et connecté !");
 }
 
 function login() {
-    let user = username.value.trim();
-    let pass = password.value.trim();
+    const user = username.value.trim();
+    const pass = password.value.trim();
 
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
         localStorage.setItem("user", user);
@@ -448,10 +457,10 @@ function login() {
         return;
     }
 
-    let users = getUsers();
-
-    if (!users[user] || users[user].pass !== pass)
+    const users = getUsers();
+    if (!users[user] || users[user].pass !== pass) {
         return alert("Identifiants incorrects.");
+    }
 
     localStorage.setItem("user", user);
     loadUserUI();
@@ -462,11 +471,9 @@ function logout() {
     location.reload();
 }
 
-
 /* =====================================================
-   👤 INTERFACE UTILISATEUR
+   UI: load user interface
 ===================================================== */
-
 function loadUserUI() {
     const user = localStorage.getItem("user");
     if (!user) return;
@@ -474,287 +481,252 @@ function loadUserUI() {
     authBox.style.display = "none";
     userBox.style.display = "block";
     postBox.style.display = "block";
-    filterTabs.style.display = "flex";
 
     currentUser.textContent = user;
+    adminPanelBtn.style.display = user === ADMIN_USER ? "inline-block" : "none";
 
-    if (user === ADMIN_USER)
-        adminPanel.style.display = "inline-block";
-    else
-        adminPanel.style.display = "none";
-
-    let users = getUsers();
-
-    let pfp = user === ADMIN_USER 
-        ? "https://i.imgur.com/0YzJ6aC.png" 
-        : (users[user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
-
+    const users = getUsers();
+    const pfp = user === ADMIN_USER ? "https://i.imgur.com/0YzJ6aC.png" : (users[user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
     userPfp.src = pfp;
 }
 
+/* =====================================================
+   Notifications helper
+===================================================== */
 function showNotification(msg) {
-    let notif = document.createElement("div");
-    notif.className = "notification";
+    const notif = document.createElement('div');
+    notif.className = 'notification';
     notif.textContent = msg;
     document.body.appendChild(notif);
     setTimeout(() => notif.remove(), 3000);
 }
 
-
 /* =====================================================
-   🏅 BADGES + AFFICHAGE
+   Badges rendering
 ===================================================== */
-
 function getBadgeHTML(username) {
-    if (username === ADMIN_USER)
-        return '<span class="badge badge-admin">👑 Admin</span>';
+    if (!username) return "";
+    if (username === ADMIN_USER) return '<span class="badge badge-admin">👑 Admin</span>';
 
-    let users = getUsers();
-    let u = users[username];
+    const users = getUsers();
+    const u = users[username];
     if (!u || !u.badges) return "";
 
-    let customBadges = getCustomBadges();
+    const customBadges = getCustomBadges();
 
     return u.badges.map(b => {
         if (b === "vip") return '<span class="badge badge-vip">💎 VIP</span>';
         if (b === "verified") return '<span class="badge badge-verified">✓ Vérifié</span>';
         if (b === "star") return '<span class="badge badge-star">⭐ Star</span>';
-
-        if (customBadges[b])
-            return `<span class="badge" style="background:${customBadges[b].color}">${customBadges[cb].icon || ''} ${b}</span>`;
-
-        return "";
-    }).join("");
+        if (customBadges[b]) return `<span class="badge" style="background:${customBadges[b].color}">${customBadges[b].icon || ''} ${b}</span>`;
+        return '';
+    }).join(' ');
 }
 
-
 /* =====================================================
-   👑 PANEL ADMIN — AFFICHAGE
-   (reste inchangé)
+   Admin: users list, delete user, reset password
+   - delete removes user, all posts, all comments by user, and user's tickets
 ===================================================== */
 
 function openAdminPanel() {
     if (localStorage.getItem("user") !== ADMIN_USER) return;
+    const users = getUsers();
+    const custom = getCustomBadges();
 
-    let users = getUsers();
-    let customBadges = getCustomBadges();
-
-    let html = "";
-
-    for (let username in users) {
-        if (username === ADMIN_USER) continue;
-
-        let u = users[username];
-
-        html += `
-        <div class="user-item">
-            <div>
-                <img class="pfp" src="${u.pfp || 'https://i.imgur.com/4ZQZ4Fc.png'}" 
-                     style="width:30px;height:30px;margin-right:10px;">
-                <b>${username}</b> ${getBadgeHTML(username)}
-
-                <div class="badge-selector">
-        `;
-
-        // Badges standards
-        ["vip","verified","star"].forEach(b => {
-            html += `
-                <div class="badge-option badge-${b}"
-                    onclick="toggleBadge('${username}','${b}')"
-                    style="${u.badges.includes(b) ? 'border-color:var(--accent);' : ''}">
-                    ${b === 'vip' ? '💎' : b === 'verified' ? '✓' : '⭐'} ${b}
-                </div>`;
-        });
-
-        // Badges personnalisés
-        for (let cb in customBadges) {
-            html += `
-                <div class="badge-option"
-                    onclick="toggleBadge('${username}','${cb}')"
-                    style="background:${customBadges[cb].color};
-                           ${u.badges.includes(cb) ? 'border-color:var(--accent);' : ''}">
-                    ${customBadges[cb].icon} ${cb}
-                </div>`;
-        }
-
-        html += `
+    let html = '';
+    for (let uname in users) {
+        if (uname === ADMIN_USER) continue;
+        const u = users[uname];
+        html += `<div class="user-item" style="display:flex;align-items:center;justify-content:space-between;padding:8px;border:1px solid var(--border);margin-bottom:8px;border-radius:8px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+                <img class="pfp" src="${u.pfp || 'https://i.imgur.com/4ZQZ4Fc.png'}" style="width:36px;height:36px;">
+                <div>
+                  <b>${uname}</b> <div class="small">${u.karma || 0} karma • inscrit ${formatDate(u.createdAt)}</div>
+                  <div>${getBadgeHTML(uname)}</div>
                 </div>
             </div>
-
             <div>
-                <button onclick="resetPassword('${username}')" style="background:#4facfe;">🔑 Reset</button>
-                <button class="delete" onclick="deleteUser('${username}')">🗑</button>
+                <button onclick="resetPassword('${uname}')">🔑 Reset</button>
+                <button onclick="deleteUser('${uname}')" style="background:var(--danger);">🗑 Supprimer</button>
             </div>
         </div>`;
     }
-
     usersList.innerHTML = html;
-    adminModal.style.display = "flex";
+    document.getElementById('adminModal').style.display = 'flex';
 }
 
 function closeAdminPanel() {
-    adminModal.style.display = "none";
+    document.getElementById('adminModal').style.display = 'none';
 }
-
-
-/* =====================================================
-   🏅 BADGES — ACTIONS
-===================================================== */
-
-function toggleBadge(username, badge) {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-
-    let users = getUsers();
-    let list = users[username].badges || [];
-
-    let index = list.indexOf(badge);
-
-    if (index >= 0) {
-        list.splice(index, 1);
-        showNotification(`❌ Badge retiré à ${username}`);
-    } else {
-        list.push(badge);
-        showNotification(`✅ Badge attribué à ${username}`);
-    }
-
-    users[username].badges = list;
-    saveUsers(users);
-
-    openAdminPanel();
-}
-
-function createCustomBadge() {
-    if (localStorage.getItem("user") !== ADMIN_USER) return;
-
-    let name = customBadgeName.value.trim();
-    let icon = customBadgeIcon.value.trim() || "";
-    let color = customBadgeColor.value;
-
-    if (!name) return alert("Nom de badge vide.");
-
-    let badges = getCustomBadges();
-    badges[name] = { icon, color };
-    localStorage.setItem("customBadges", JSON.stringify(badges));
-
-    customBadgeName.value = "";
-    customBadgeIcon.value = "";
-    customBadgeColor.value = "#ff0000";
-
-    showNotification(`🎖 Badge personnalisé "${name}" créé !`);
-    openAdminPanel();
-}
-
-function deleteCustomBadge(name) {
-    if (!confirm("Supprimer ce badge personnalisé ?")) return;
-
-    let badges = getCustomBadges();
-    delete badges[name];
-    localStorage.setItem("customBadges", JSON.stringify(badges));
-
-    showNotification("❌ Badge supprimé.");
-    openAdminPanel();
-}
-
-
-/* =====================================================
-   🔑 RESET MOT DE PASSE (admin)
-===================================================== */
 
 function resetPassword(username) {
-    let users = getUsers();
-    let newPass = prompt("Nouveau mot de passe pour " + username);
-
-    if (!newPass) return;
-
+    if (localStorage.getItem('user') !== ADMIN_USER) return;
+    if (!confirm(`Réinitialiser le mot de passe de ${username} ?`)) return;
+    const newPass = prompt('Nouveau mot de passe (min 4 caractères)');
+    if (!newPass || newPass.length < 4) return alert('Mot de passe invalide.');
+    const users = getUsers();
     users[username].pass = newPass;
     saveUsers(users);
-
     showNotification(`🔑 Mot de passe réinitialisé pour ${username}`);
 }
 
-
-/* =====================================================
-   ❌ SUPPRESSION UTILISATEUR
-===================================================== */
-
 function deleteUser(username) {
-    if (!confirm("Supprimer l'utilisateur ET tous ses posts ?")) return;
+    if (localStorage.getItem('user') !== ADMIN_USER) return;
+    if (!confirm(`Supprimer l'utilisateur ${username} ET TOUT son contenu ? Cela supprimera posts, commentaires et tickets.`)) return;
 
-    // Supprimer posts
-    let posts = getPosts().filter(p => p.user !== username);
+    // remove posts by user
+    let posts = getPosts();
+    posts = posts.filter(p => p.user !== username);
+
+    // remove comments by user (iterate remaining posts)
+    posts.forEach(p => {
+        if (!p.comments) return;
+        p.comments = p.comments.filter(c => c.user !== username);
+    });
+
     savePosts(posts);
 
-    // Supprimer compte
-    let users = getUsers();
+    // remove tickets by user
+    let tickets = getTickets();
+    tickets = tickets.filter(t => t.user !== username);
+    saveTickets(tickets);
+
+    // remove account
+    const users = getUsers();
     delete users[username];
     saveUsers(users);
 
-    showNotification(`🗑 Utilisateur ${username} supprimé.`);
+    showNotification(`🗑 Utilisateur ${username} et tout son contenu supprimé.`);
     openAdminPanel();
 }
 
-
 /* =====================================================
-   📨 SYSTEME DE TICKETS
+   Tickets: send, render, admin reply, mark resolved, delete
+   Ticket object: { user, msg, status, createdAt, replies: [{by, msg, at}], resolvedAt? }
 ===================================================== */
 
 function openTicketPanel() {
-    let tickets = getTickets();
-    let html = "";
-
-    tickets.forEach((t, i) => {
-        html += `
-        <div class="user-item">
-            <b>${t.user}</b> : ${t.msg}
-            <button class="delete" onclick="deleteTicket(${i})">x</button>
-        </div>`;
-    });
-
-    ticketsList.innerHTML = html;
-    ticketModal.style.display = "flex";
+    renderTicketList();
+    document.getElementById('ticketModal').style.display = 'flex';
 }
 
 function closeTicketPanel() {
-    ticketModal.style.display = "none";
+    document.getElementById('ticketModal').style.display = 'none';
 }
 
 function sendTicket() {
-    let msg = ticketMessage.value.trim();
-    if (!msg) return alert("Le message est vide.");
-
-    let user = localStorage.getItem("user");
-    let tickets = getTickets();
-
-    tickets.push({ user, msg });
+    const msg = ticketMessage.value.trim();
+    if (!msg) return alert('Le message est vide.');
+    const user = localStorage.getItem('user') || 'Anonyme';
+    const tickets = getTickets();
+    tickets.push({
+        user,
+        msg,
+        status: 'En attente',
+        createdAt: Date.now(),
+        replies: []
+    });
     saveTickets(tickets);
+    ticketMessage.value = '';
+    showNotification('📨 Ticket envoyé !');
+    renderTicketList();
+}
 
-    ticketMessage.value = "";
-    showNotification("📨 Ticket envoyé !");
+function renderTicketList() {
+    const tickets = getTickets();
+    if (!tickets.length) {
+        ticketsList.innerHTML = '<div class="small">Aucun ticket</div>';
+        return;
+    }
+    let html = '';
+    tickets.forEach((t, i) => {
+        html += `<div class="ticket-item">
+            <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <b>${t.user}</b>
+                    <span class="small">${timeAgo(t.createdAt)} • ${formatDate(t.createdAt)}</span>
+                    <span class="ticket-status ${t.status === 'Résolu' ? 'resolved' : 'open'}" style="margin-left:8px">${t.status}</span>
+                </div>
+                <div style="margin-top:6px;">${t.msg}</div>
+                <div style="margin-top:8px;">${(t.replies||[]).map(r=>`<div class="comment small"><b>${r.by}</b> • ${timeAgo(r.at)}<div>${r.msg}</div></div>`).join('')}</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;margin-left:10px;">
+                <!-- if admin: reply textarea / buttons -->
+                ${localStorage.getItem('user') === ADMIN_USER ? `
+                    <textarea id="reply-input-${i}" placeholder="Répondre..." style="width:220px;height:60px;"></textarea>
+                    <button onclick="replyToTicket(${i})">Répondre</button>
+                    <button onclick="markTicketResolved(${i})" style="background:var(--success)">Marquer résolu</button>
+                ` : `
+                    ${t.status !== 'Résolu' ? `<button onclick="markMyTicket(${i})">Marquer comme résolu (si résolu)</button>` : ``}
+                `}
+                <button onclick="deleteTicket(${i})" style="background:var(--danger)">Suppr.</button>
+            </div>
+        </div>`;
+    });
+    ticketsList.innerHTML = html;
+}
+
+function replyToTicket(i) {
+    if (localStorage.getItem('user') !== ADMIN_USER) return;
+    const el = document.getElementById(`reply-input-${i}`);
+    if (!el) return;
+    const text = el.value.trim();
+    if (!text) return alert('Réponse vide.');
+    const tickets = getTickets();
+    tickets[i].replies = tickets[i].replies || [];
+    tickets[i].replies.push({ by: ADMIN_USER, msg: text, at: Date.now() });
+    // set status to En attente -> admin answered so maybe still En attente or "En cours"
+    tickets[i].status = 'En attente';
+    saveTickets(tickets);
+    showNotification('✉️ Répondu au ticket.');
+    renderTicketList();
+}
+
+function markTicketResolved(i) {
+    if (localStorage.getItem('user') !== ADMIN_USER) return;
+    const tickets = getTickets();
+    tickets[i].status = 'Résolu';
+    tickets[i].resolvedAt = Date.now();
+    saveTickets(tickets);
+    showNotification('✅ Ticket marqué comme résolu.');
+    renderTicketList();
+}
+
+// allow user to mark their own ticket resolved (confirmation)
+function markMyTicket(i) {
+    const user = localStorage.getItem('user') || 'Anonyme';
+    const tickets = getTickets();
+    if (tickets[i].user !== user) return alert("Vous ne pouvez marquer que vos propres tickets.");
+    if (!confirm("Marquer ce ticket comme résolu ?")) return;
+    tickets[i].status = 'Résolu';
+    tickets[i].resolvedAt = Date.now();
+    saveTickets(tickets);
+    renderTicketList();
 }
 
 function deleteTicket(i) {
-    let tickets = getTickets();
-    tickets.splice(i, 1);
+    if (!confirm("Supprimer ce ticket ?")) return;
+    const tickets = getTickets();
+    tickets.splice(i,1);
     saveTickets(tickets);
-    openTicketPanel();
+    renderTicketList();
 }
+
 /* =====================================================
-   📝 CRÉATION DE POST
+   Posts: create, save, render
+   - rendering uses timeAgo and shows votes
+   - filters implemented
 ===================================================== */
 
 function addPost() {
     if (!localStorage.getItem('user')) return alert("Tu dois être connecté pour poster.");
-
-    let content = postContent.value.trim();
+    const content = postContent.value.trim();
     if (!content) return alert("Le post est vide.");
 
-    let img = "";
     if (postImage.files[0]) {
-        let reader = new FileReader();
-        reader.onload = () => {
-            img = reader.result;
-            savePost(content, img);
-        };
+        const reader = new FileReader();
+        reader.onload = () => savePost(content, reader.result);
         reader.readAsDataURL(postImage.files[0]);
     } else {
         savePost(content, "");
@@ -762,10 +734,9 @@ function addPost() {
 }
 
 function savePost(content, img) {
-    let posts = getPosts();
-    let user = localStorage.getItem("user");
-
-    let post = {
+    const posts = getPosts();
+    const user = localStorage.getItem('user');
+    const post = {
         id: Date.now(),
         user,
         content,
@@ -773,229 +744,170 @@ function savePost(content, img) {
         date: Date.now(),
         votes: 0,
         comments: [],
-        anonymous: anonymousMode.checked
+        anonymous: !!anonymousMode.checked
     };
-
     posts.unshift(post);
     savePosts(posts);
-
-    postContent.value = "";
-    postImage.value = "";
+    postContent.value = '';
+    postImage.value = '';
     anonymousMode.checked = false;
-
     showNotification("🚀 Post publié !");
     renderPosts();
 }
 
-
-/* =====================================================
-   📝 AFFICHAGE DES POSTS
-===================================================== */
-
 function renderPosts() {
     let posts = getPosts();
-    let user = localStorage.getItem("user");
-    let filter = currentFilter;
-    let query = (searchInput && searchInput.value ? searchInput.value.toLowerCase() : "");
+    const me = localStorage.getItem('user');
+    const filter = currentFilter || 'all';
+    const query = (searchInput && searchInput.value) ? searchInput.value.toLowerCase() : '';
 
-    // Filtre recherche
-    posts = posts.filter(p => p.content.toLowerCase().includes(query));
+    // search filter
+    if (query) posts = posts.filter(p => p.content.toLowerCase().includes(query));
 
-    // Filtres par onglets
-    if (filter === "top") posts.sort((a,b) => b.votes - a.votes);
-    if (filter === "recent") posts.sort((a,b) => b.date - a.date);
-    if (filter === "mine") posts = posts.filter(p => p.user === user);
+    // filters
+    if (filter === 'top') posts.sort((a,b) => b.votes - a.votes);
+    else if (filter === 'recent') posts.sort((a,b) => b.date - a.date);
+    else if (filter === 'mine') posts = posts.filter(p => p.user === me);
 
-    let html = "";
-
+    let html = '';
     if (posts.length === 0) {
-        html = '<div class="box">Aucun post pour le moment.</div>';
+        html = '<div class="box small">Aucun post pour le moment.</div>';
     } else {
         posts.forEach(p => {
-            let displayUser = p.anonymous ? "Anonyme" : p.user;
-            let badges = p.anonymous ? "" : getBadgeHTML(p.user);
+            const displayUser = p.anonymous ? 'Anonyme' : p.user;
+            const badges = p.anonymous ? '' : getBadgeHTML(p.user);
+            const pfp = p.anonymous ? 'https://i.imgur.com/CJH0pCj.png' : (getUsers()[p.user]?.pfp || 'https://i.imgur.com/4ZQZ4Fc.png');
 
-            let pfp = p.anonymous
-                ? "https://i.imgur.com/CJH0pCj.png"
-                : (getUsers()[p.user]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png");
-
-            html += `
-            <div class="post">
-                <div style="display:flex;align-items:center;margin-bottom:10px;">
+            html += `<div class="post">
+                <div style="display:flex;align-items:center;gap:10px;">
                     <img class="pfp" src="${pfp}">
-                    <b style="margin-left:10px;cursor:pointer;" onclick="openProfile('${p.user}')">
-                        ${displayUser}
-                    </b>
-                    ${badges}
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <b style="cursor:pointer" onclick="openProfile('${p.user}')">${displayUser}</b>
+                            ${badges}
+                            <div class="post-meta">${timeAgo(p.date)} • ${formatDate(p.date)}</div>
+                        </div>
+                        <div style="margin-top:8px;font-size:15px">${escapeHtml(p.content)}</div>
+                    </div>
                 </div>
-
-                <p>${p.content}</p>
-
-                ${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:8px;margin-top:10px;">` : ""}
-
-                <div style="margin-top:10px;">
-                    <button class="vote-btn" onclick="vote(${p.id},1)">⬆</button>
-                    ${p.votes}
-                    <button class="vote-btn" onclick="vote(${p.id},-1)">⬇</button>
-
-                    <button onclick="toggleComments(${p.id})">💬 Commentaires (${p.comments.length})</button>
-
-                    ${(user === p.user || user === ADMIN_USER)
-                        ? `<button class="delete" onclick="deletePost(${p.id})">🗑</button>`
-                        : ""}
+                ${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:8px;margin-top:10px;">` : ''}
+                <div style="margin-top:10px;display:flex;align-items:center;">
+                    <button class="vote-btn" onclick="vote(${p.id},1)">▲</button>
+                    <div class="small" style="width:40px;text-align:center">${p.votes}</div>
+                    <button class="vote-btn" onclick="vote(${p.id},-1)">▼</button>
+                    <button onclick="toggleComments(${p.id})" style="margin-left:12px;">💬 Commentaires (${p.comments?.length || 0})</button>
+                    ${(me === p.user || me === ADMIN_USER) ? `<button class="small" style="margin-left:auto;background:var(--danger)" onclick="deletePost(${p.id})">🗑 Suppr.</button>` : ''}
                 </div>
-
-                <!-- Commentaires -->
                 <div id="comments-${p.id}" style="display:none;margin-top:10px;">
                     <textarea id="comment-input-${p.id}" placeholder="Ajouter un commentaire..."></textarea>
                     <button onclick="addComment(${p.id})">Publier</button>
-                    <div id="comment-list-${p.id}">
-                        ${renderCommentsHTML(p)}
-                    </div>
+                    <div id="comment-list-${p.id}">${renderCommentsHTML(p)}</div>
                 </div>
             </div>`;
         });
     }
-
-    if (postsContainer) postsContainer.innerHTML = html;
+    postsContainer.innerHTML = html;
 }
 
 function renderCommentsHTML(post) {
-    let user = localStorage.getItem("user");
-
-    return post.comments.map((c,i) => `
+    const me = localStorage.getItem('user');
+    return (post.comments || []).map((c,i) => `
         <div class="comment">
-            <b>${c.user}</b> : ${c.text}
-            ${(c.user === user || user === ADMIN_USER)
-                ? `<button class="delete" onclick="deleteComment(${post.id},${i})">x</button>`
-                : ""}
+            <b>${c.user}</b> <span class="small">• ${timeAgo(c.at)}</span>
+            <div style="margin-top:6px;">${escapeHtml(c.text)}</div>
+            ${(c.user === me || me === ADMIN_USER) ? `<button style="background:var(--danger);margin-top:6px;" onclick="deleteComment(${post.id},${i})">x</button>` : ''}
         </div>
-    `).join("");
+    `).join('');
 }
 
+/* escape HTML to avoid injection in content */
+function escapeHtml(s) {
+    return (s+'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+}
 
-/* =====================================================
-   🔼🔽 VOTES
-===================================================== */
-
+/* votes */
 function vote(id, val) {
-    let posts = getPosts();
-    let p = posts.find(x => x.id === id);
+    const posts = getPosts();
+    const p = posts.find(x => x.id === id);
     if (!p) return;
-
     p.votes += val;
     savePosts(posts);
+
+    // update karma for author
+    const users = getUsers();
+    if (users[p.user]) {
+        // recompute karma as sum of votes
+        const allPosts = getPosts().filter(pp => pp.user === p.user);
+        users[p.user].karma = allPosts.reduce((s,pp) => s + (pp.votes||0), 0);
+        saveUsers(users);
+    }
     renderPosts();
 }
 
-
-/* =====================================================
-   💬 COMMENTAIRES
-===================================================== */
-
+/* comments */
 function toggleComments(id) {
-    let box = document.getElementById("comments-" + id);
+    const box = document.getElementById('comments-' + id);
     if (!box) return;
-    box.style.display = box.style.display === "none" ? "block" : "none";
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
 
 function addComment(id) {
     if (!localStorage.getItem('user')) return alert("Tu dois être connecté pour commenter.");
-
-    let posts = getPosts();
-    let p = posts.find(x => x.id === id);
+    const posts = getPosts();
+    const p = posts.find(x => x.id === id);
     if (!p) return;
-
-    let text = document.getElementById("comment-input-" + id).value.trim();
+    const textEl = document.getElementById('comment-input-' + id);
+    const text = textEl.value.trim();
     if (!text) return;
-
-    p.comments.push({
-        user: localStorage.getItem("user"),
-        text
-    });
-
+    p.comments = p.comments || [];
+    p.comments.push({ user: localStorage.getItem('user'), text, at: Date.now() });
     savePosts(posts);
+    textEl.value = '';
     renderPosts();
 }
 
 function deleteComment(postId, index) {
-    let posts = getPosts();
-    let p = posts.find(x => x.id === postId);
-    p.comments.splice(index, 1);
+    if (!confirm("Supprimer ce commentaire ?")) return;
+    const posts = getPosts();
+    const p = posts.find(x => x.id === postId);
+    if (!p) return;
+    p.comments.splice(index,1);
     savePosts(posts);
     renderPosts();
 }
 
-
-/* =====================================================
-   ❌ SUPPRESSION POST
-===================================================== */
-
+/* delete post */
 function deletePost(id) {
     if (!confirm("Supprimer ce post ?")) return;
-
-    let posts = getPosts().filter(p => p.id !== id);
+    let posts = getPosts();
+    const p = posts.find(x => x.id === id);
+    if (!p) return;
+    posts = posts.filter(x => x.id !== id);
     savePosts(posts);
     renderPosts();
 }
 
-
 /* =====================================================
-   🔍 RECHERCHE + FILTRES
+   Filters
 ===================================================== */
-
-let currentFilter = "all";
-
+let currentFilter = 'all';
 function setFilter(f) {
     currentFilter = f;
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    const tab = Array.from(document.querySelectorAll(".tab")).find(t => t.getAttribute('data-filter') === f);
-    if (tab) tab.classList.add("active");
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const tab = Array.from(document.querySelectorAll('.tab')).find(t => t.getAttribute('data-filter') === f);
+    if (tab) tab.classList.add('active');
     renderPosts();
 }
-
-function filterPosts() {
-    renderPosts();
-}
-
+function filterPosts() { renderPosts(); }
 
 /* =====================================================
-   😊 EMOJI PICKER
+   Theme
 ===================================================== */
-
-const emojis = ["😀","😁","😂","🤣","😅","😊","😍","😘","😎","🤔","😢","😭","😡","👍","🔥","⭐","💀","💎","❤️"];
-
-function toggleEmojiPicker() {
-    let box = document.getElementById("emojiPicker");
-
-    if (!box.innerHTML.trim()) {
-        emojis.forEach(e => {
-            let btn = document.createElement("button");
-            btn.textContent = e;
-            btn.style.margin = "5px";
-            btn.onclick = () => {
-                postContent.value += e;
-            };
-            box.appendChild(btn);
-        });
-    }
-
-    box.style.display = box.style.display === "block" ? "none" : "block";
-}
-
-/* =====================================================
-   🌗 THEME (sombre / clair)
-===================================================== */
-
 function applyTheme(theme) {
-    if (theme === 'light') {
-        document.documentElement.classList.add('light');
-    } else {
-        document.documentElement.classList.remove('light');
-    }
+    if (theme === 'light') document.documentElement.classList.add('light');
+    else document.documentElement.classList.remove('light');
     localStorage.setItem('theme', theme);
 }
-
 function toggleTheme() {
     const current = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
     const next = current === 'light' ? 'dark' : 'light';
@@ -1003,122 +915,102 @@ function toggleTheme() {
 }
 
 /* =====================================================
-   👤 PROFIL — ouverture, sélection et sauvegarde d'une pdp
+   Profile: open, pick image, save, cancel
 ===================================================== */
-
 function openProfile(username) {
-    // If username not provided, open current user's profile
     const viewer = localStorage.getItem('user');
     const target = username || viewer;
-    if (!target) return alert("Aucun utilisateur sélectionné.");
+    if (!target) return alert('Aucun utilisateur sélectionné.');
 
     const users = getUsers();
     const u = users[target] || {};
-
     profileName.textContent = target;
-    profilePicture.src = u.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
-    profilePreview.style.display = "none";
-    profilePreview.src = "";
+    profilePicture.src = u.pfp || 'https://i.imgur.com/4ZQZ4Fc.png';
+    profilePreview.style.display = 'none';
+    profilePreview.src = '';
 
-    // nombre de posts
     const posts = getPosts().filter(p => p.user === target);
     profilePosts.textContent = posts.length;
+    profileKarma.textContent = u.karma || 0;
+    profileSince.textContent = u.createdAt ? formatDate(u.createdAt) : '-';
+    profileBadges.innerHTML = getBadgeHTML(target) || '<span class="small">Aucun badge</span>';
 
-    // Controls visibility: if it's our own profile, show change controls
     if (viewer && viewer === target) {
-        changeProfileBtn.style.display = "inline-block";
-        // hide save/cancel until a file selected
-        saveProfileImageBtn.style.display = "none";
-        cancelProfileImageBtn.style.display = "none";
+        changeProfileBtn.style.display = 'inline-block';
     } else {
-        changeProfileBtn.style.display = "none";
-        saveProfileImageBtn.style.display = "none";
-        cancelProfileImageBtn.style.display = "none";
+        changeProfileBtn.style.display = 'none';
     }
 
-    profilePage.style.display = "block";
     stagedProfileImageData = null;
+    document.getElementById('profilePage').style.display = 'block';
 }
 
 function closeProfile() {
-    profilePage.style.display = "none";
-    // reset file input
-    profileImageInput.value = "";
-    profilePreview.style.display = "none";
+    document.getElementById('profilePage').style.display = 'none';
+    profileImageInput.value = '';
+    profilePreview.style.display = 'none';
     stagedProfileImageData = null;
 }
 
 function triggerProfileImagePick() {
-    // open file picker
     profileImageInput.click();
 }
 
-profileImageInput.addEventListener('change', handleProfileImageSelected);
-
-function handleProfileImageSelected() {
+profileImageInput.addEventListener('change', function() {
     const file = profileImageInput.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
         stagedProfileImageData = reader.result;
         profilePreview.src = stagedProfileImageData;
-        profilePreview.style.display = "inline-block";
-        saveProfileImageBtn.style.display = "inline-block";
-        cancelProfileImageBtn.style.display = "inline-block";
-        // also show preview in main picture so user sees it immediately
+        profilePreview.style.display = 'block';
+        saveProfileImageBtn.style.display = 'inline-block';
+        cancelProfileImageBtn.style.display = 'inline-block';
+        // show preview immediate
         profilePicture.src = stagedProfileImageData;
     };
     reader.readAsDataURL(file);
-}
+});
 
 function saveProfileImage() {
     const username = localStorage.getItem('user');
     if (!username) return alert("Tu dois être connecté pour changer la photo.");
-
     if (!stagedProfileImageData) return alert("Aucune image sélectionnée.");
-
     const users = getUsers();
-    users[username] = users[username] || { pass: "", pfp: "", karma:0, badges: [] };
+    users[username] = users[username] || { pass:'', pfp:'', karma:0, badges:[], createdAt: Date.now() };
     users[username].pfp = stagedProfileImageData;
     saveUsers(users);
-
-    // Update UI everywhere
     userPfp.src = stagedProfileImageData;
     profilePicture.src = stagedProfileImageData;
-    profilePreview.style.display = "none";
-    profileImageInput.value = "";
-    saveProfileImageBtn.style.display = "none";
-    cancelProfileImageBtn.style.display = "none";
+    profilePreview.style.display = 'none';
+    profileImageInput.value = '';
+    saveProfileImageBtn.style.display = 'none';
+    cancelProfileImageBtn.style.display = 'none';
     stagedProfileImageData = null;
-
-    showNotification("✅ Photo de profil mise à jour !");
+    showNotification('✅ Photo de profil mise à jour !');
     renderPosts();
 }
 
 function cancelProfileImage() {
-    // revert preview to stored picture
     const username = localStorage.getItem('user');
     const users = getUsers();
-    const stored = users[username]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
-    profilePicture.src = stored;
-    profilePreview.style.display = "none";
-    profileImageInput.value = "";
+    profilePicture.src = users[username]?.pfp || 'https://i.imgur.com/4ZQZ4Fc.png';
+    profilePreview.style.display = 'none';
+    profileImageInput.value = '';
     stagedProfileImageData = null;
-    saveProfileImageBtn.style.display = "none";
-    cancelProfileImageBtn.style.display = "none";
+    saveProfileImageBtn.style.display = 'none';
+    cancelProfileImageBtn.style.display = 'none';
 }
 
 /* =====================================================
-   🚀 INITIALISATION AU DÉMARRAGE
+   Init on load
 ===================================================== */
-
 window.onload = () => {
-    // Appliquer le thème sauvegardé (par défaut 'dark')
+    // apply theme
     const savedTheme = localStorage.getItem('theme') || 'dark';
     applyTheme(savedTheme);
 
-    // Configurer écouteurs des onglets (utiliser data-filter)
+    // Setup tab click listeners (already have inline onclick, but keep reliable)
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
             const f = tab.getAttribute('data-filter');
@@ -1126,30 +1018,18 @@ window.onload = () => {
         });
     });
 
-    // Afficher l'UI utilisateur si connecté
-    if (localStorage.getItem("user")) {
-        loadUserUI();
-    }
+    // Show user UI if logged
+    if (localStorage.getItem('user')) loadUserUI();
+
     renderPosts();
 };
 
-
-/* =====================================================
-   ❌ FERMETURE DES MODALS
-===================================================== */
-
-function closeAdminPanel() {
-    adminModal.style.display = "none";
-}
-
-function closeTicketPanel() {
-    ticketModal.style.display = "none";
-}
-
-/* Fermeture modals si clic extérieur */
+/* close modals on outside click */
 window.onclick = function(e) {
-    if (e.target === adminModal) adminModal.style.display = "none";
-    if (e.target === ticketModal) ticketModal.style.display = "none";
+    const adminModal = document.getElementById('adminModal');
+    const ticketModal = document.getElementById('ticketModal');
+    if (e.target === adminModal) adminModal.style.display = 'none';
+    if (e.target === ticketModal) ticketModal.style.display = 'none';
 };
 </script>
 
