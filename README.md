@@ -952,6 +952,11 @@ function closeProfile() {
     stagedProfileImageData = null;
 }
 
+function trigger_profileImagePick_compat() {
+    // fallback if triggerProfileImagePick isn't bound (older versions)
+    profileImageInput.click();
+}
+
 function triggerProfileImagePick() {
     profileImageInput.click();
 }
