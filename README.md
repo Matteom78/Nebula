@@ -222,6 +222,12 @@ button:hover {
     width: auto;
     flex: 1;
 }
+
+/* Profile modal specific */
+#profilePage img.pfp { width: 80px; height: 80px; margin-bottom: 10px; }
+#profileControls { margin-top: 10px; display:flex; gap:8px; align-items:center; }
+#profilePreview { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--border); }
+#saveProfileImage, #cancelProfileImage { display:none; }
 </style>
 </head>
 <body>
@@ -235,7 +241,6 @@ button:hover {
 </div>
 
 <!-- 🧭 ONGLET DE FILTRES -->
-<!-- rendu visible par défaut pour permettre la navigation sans être connecté -->
 <div class="filter-tabs" id="filterTabs" style="display:flex;">
     <div class="tab active" data-filter="all">🌟 Tous</div>
     <div class="tab" data-filter="top">🔥 Populaires</div>
@@ -256,7 +261,7 @@ button:hover {
 <div id="userBox" class="box" style="display:none;">
     <img id="userPfp" class="pfp" src="">
     Connecté en tant que : <b id="currentUser"></b>
-    <button onclick="openProfile(localStorage.getItem('user'))">Mon Profil</button>
+    <button id="myProfileBtn" onclick="openProfile()" >Mon Profil</button>
     <button id="adminPanel" onclick="openAdminPanel()" style="display:none;background:#764ba2;">👑 Panel Admin</button>
     <button onclick="logout()">Se déconnecter</button>
 </div>
@@ -286,12 +291,26 @@ button:hover {
 <!-- 👤 PROFIL UTILISATEUR -->
 <div id="profilePage" class="box" style="display:none;">
     <h2>Profil</h2>
-    <img id="profilePicture" class="pfp" style="width:80px;height:80px;">
-    <input type="file" id="profileImageInput" accept="image/*" onchange="updateProfilePicture()">
-    <p><b>Nom :</b> <span id="profileName"></span></p>
-    <p><b>Posts :</b> <span id="profilePosts"></span></p>
+    <img id="profilePicture" class="pfp" src="">
+    <div id="profileControls">
+        <!-- Hidden file input used to pick image -->
+        <input type="file" id="profileImageInput" accept="image/*" style="display:none;">
+        <!-- Visible preview and buttons -->
+        <img id="profilePreview" src="" alt="Prévisualisation" style="display:none;">
+        <div style="flex:1">
+            <p><b>Nom :</b> <span id="profileName"></span></p>
+            <p><b>Posts :</b> <span id="profilePosts"></span></p>
+        </div>
+        <div id="profileButtons">
+            <!-- shown only when viewing own profile -->
+            <button id="changeProfileBtn" onclick="triggerProfileImagePick()" style="display:none;">Changer la photo</button>
+            <button id="saveProfileImage" onclick="saveProfileImage()" style="display:none;">Enregistrer</button>
+            <button id="cancelProfileImage" onclick="cancelProfileImage()" style="display:none;">Annuler</button>
+        </div>
+    </div>
     <button onclick="closeProfile()">Fermer</button>
 </div>
+
 <!-- 👑 PANEL ADMIN -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
@@ -341,7 +360,7 @@ button:hover {
 <script>
 /* =====================================================
    🔐 CONSTANTES & HELPERS
-   Instanciation explicite des éléments DOM critiques
+   + DOM references
 ===================================================== */
 
 const ADMIN_USER = "Admin";
@@ -358,12 +377,17 @@ const filterTabs = document.getElementById('filterTabs');
 const currentUser = document.getElementById('currentUser');
 const adminPanel = document.getElementById('adminPanel');
 const userPfp = document.getElementById('userPfp');
+const myProfileBtn = document.getElementById('myProfileBtn');
 
 const profilePage = document.getElementById('profilePage');
 const profilePicture = document.getElementById('profilePicture');
 const profileName = document.getElementById('profileName');
 const profilePosts = document.getElementById('profilePosts');
 const profileImageInput = document.getElementById('profileImageInput');
+const profilePreview = document.getElementById('profilePreview');
+const changeProfileBtn = document.getElementById('changeProfileBtn');
+const saveProfileImageBtn = document.getElementById('saveProfileImage');
+const cancelProfileImageBtn = document.getElementById('cancelProfileImage');
 
 const ticketsList = document.getElementById('ticketsList');
 const usersList = document.getElementById('usersList');
@@ -372,6 +396,8 @@ const ticketMessage = document.getElementById('ticketMessage');
 const postContent = document.getElementById('postContent');
 const postImage = document.getElementById('postImage');
 const anonymousMode = document.getElementById('anonymousMode');
+
+let stagedProfileImageData = null; // temp storage for preview before save
 
 function getUsers() { return JSON.parse(localStorage.getItem("users") || "{}"); }
 function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
@@ -495,7 +521,7 @@ function getBadgeHTML(username) {
         if (b === "star") return '<span class="badge badge-star">⭐ Star</span>';
 
         if (customBadges[b])
-            return `<span class="badge" style="background:${customBadges[b].color}">${customBadges[b].icon} ${b}</span>`;
+            return `<span class="badge" style="background:${customBadges[b].color}">${customBadges[cb].icon || ''} ${b}</span>`;
 
         return "";
     }).join("");
@@ -504,6 +530,7 @@ function getBadgeHTML(username) {
 
 /* =====================================================
    👑 PANEL ADMIN — AFFICHAGE
+   (reste inchangé)
 ===================================================== */
 
 function openAdminPanel() {
@@ -976,56 +1003,110 @@ function toggleTheme() {
 }
 
 /* =====================================================
-   👤 PROFIL — ouverture et update photo
+   👤 PROFIL — ouverture, sélection et sauvegarde d'une pdp
 ===================================================== */
 
 function openProfile(username) {
-    if (!username) return;
-    const users = getUsers();
-    const u = users[username] || {};
+    // If username not provided, open current user's profile
+    const viewer = localStorage.getItem('user');
+    const target = username || viewer;
+    if (!target) return alert("Aucun utilisateur sélectionné.");
 
-    profileName.textContent = username;
+    const users = getUsers();
+    const u = users[target] || {};
+
+    profileName.textContent = target;
     profilePicture.src = u.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
+    profilePreview.style.display = "none";
+    profilePreview.src = "";
 
     // nombre de posts
-    const posts = getPosts().filter(p => p.user === username);
+    const posts = getPosts().filter(p => p.user === target);
     profilePosts.textContent = posts.length;
 
-    // si on regarde son propre profil, autoriser l'upload
-    if (localStorage.getItem('user') === username) {
-        profileImageInput.style.display = "block";
+    // Controls visibility: if it's our own profile, show change controls
+    if (viewer && viewer === target) {
+        changeProfileBtn.style.display = "inline-block";
+        // hide save/cancel until a file selected
+        saveProfileImageBtn.style.display = "none";
+        cancelProfileImageBtn.style.display = "none";
     } else {
-        profileImageInput.style.display = "none";
+        changeProfileBtn.style.display = "none";
+        saveProfileImageBtn.style.display = "none";
+        cancelProfileImageBtn.style.display = "none";
     }
 
     profilePage.style.display = "block";
+    stagedProfileImageData = null;
 }
 
 function closeProfile() {
     profilePage.style.display = "none";
+    // reset file input
+    profileImageInput.value = "";
+    profilePreview.style.display = "none";
+    stagedProfileImageData = null;
 }
 
-function updateProfilePicture() {
+function triggerProfileImagePick() {
+    // open file picker
+    profileImageInput.click();
+}
+
+profileImageInput.addEventListener('change', handleProfileImageSelected);
+
+function handleProfileImageSelected() {
     const file = profileImageInput.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = () => {
-        const data = reader.result;
-        const username = localStorage.getItem('user');
-        if (!username) return alert("Tu dois être connecté pour changer la photo.");
-
-        const users = getUsers();
-        users[username] = users[username] || { pass: "", pfp: "", karma:0, badges: [] };
-        users[username].pfp = data;
-        saveUsers(users);
-
-        // mise à jour UI
-        profilePicture.src = data;
-        userPfp.src = data;
-        showNotification("✅ Photo de profil mise à jour !");
-        renderPosts();
+        stagedProfileImageData = reader.result;
+        profilePreview.src = stagedProfileImageData;
+        profilePreview.style.display = "inline-block";
+        saveProfileImageBtn.style.display = "inline-block";
+        cancelProfileImageBtn.style.display = "inline-block";
+        // also show preview in main picture so user sees it immediately
+        profilePicture.src = stagedProfileImageData;
     };
     reader.readAsDataURL(file);
+}
+
+function saveProfileImage() {
+    const username = localStorage.getItem('user');
+    if (!username) return alert("Tu dois être connecté pour changer la photo.");
+
+    if (!stagedProfileImageData) return alert("Aucune image sélectionnée.");
+
+    const users = getUsers();
+    users[username] = users[username] || { pass: "", pfp: "", karma:0, badges: [] };
+    users[username].pfp = stagedProfileImageData;
+    saveUsers(users);
+
+    // Update UI everywhere
+    userPfp.src = stagedProfileImageData;
+    profilePicture.src = stagedProfileImageData;
+    profilePreview.style.display = "none";
+    profileImageInput.value = "";
+    saveProfileImageBtn.style.display = "none";
+    cancelProfileImageBtn.style.display = "none";
+    stagedProfileImageData = null;
+
+    showNotification("✅ Photo de profil mise à jour !");
+    renderPosts();
+}
+
+function cancelProfileImage() {
+    // revert preview to stored picture
+    const username = localStorage.getItem('user');
+    const users = getUsers();
+    const stored = users[username]?.pfp || "https://i.imgur.com/4ZQZ4Fc.png";
+    profilePicture.src = stored;
+    profilePreview.style.display = "none";
+    profileImageInput.value = "";
+    stagedProfileImageData = null;
+    saveProfileImageBtn.style.display = "none";
+    cancelProfileImageBtn.style.display = "none";
 }
 
 /* =====================================================
@@ -1064,7 +1145,6 @@ function closeAdminPanel() {
 function closeTicketPanel() {
     ticketModal.style.display = "none";
 }
-
 
 /* Fermeture modals si clic extérieur */
 window.onclick = function(e) {
