@@ -317,6 +317,12 @@ button:hover {
 
         <div style="margin-top:12px;">
             <h3>Badges personnalisés</h3>
+
+            <!-- NOTE: indicate that the option is in the admin panel -->
+            <div class="small" style="margin-bottom:8px;color:var(--muted);">
+                ℹ️ Cette option est disponible dans le Panel Admin — crée et attribue des badges depuis ici.
+            </div>
+
             <div class="custom-badge-form" style="display:flex;gap:8px;align-items:center;">
                 <input type="text" id="customBadgeName" placeholder="Nom du badge">
                 <input type="text" id="customBadgeIcon" placeholder="Icône (emoji)">
