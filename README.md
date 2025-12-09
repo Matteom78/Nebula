@@ -11,7 +11,7 @@
     --accent: #7a4cff;
     --accent2: #ff4cff;
     --box: #1b1f3b;
-    --border: #2a2e52;
+    --border: #2a252;
     --muted: #9aa0c7;
     --success: #27ae60;
     --danger: #e74c3c;
@@ -201,6 +201,23 @@ button:hover {
 /* responsive */
 @media (max-width:600px) {
     .post-meta { flex-wrap:wrap; gap:6px; }
+}
+
+/* badge-option (admin assign UI) */
+.badge-option {
+    padding:6px 8px;
+    border-radius:12px;
+    cursor:pointer;
+    margin-right:6px;
+    border:2px solid transparent;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-weight:700;
+}
+.badge-option.active {
+    border-color: var(--accent);
+    transform: scale(1.03);
 }
 </style>
 </head>
@@ -527,7 +544,7 @@ function getBadgeHTML(username) {
 /* =====================================================
    Admin: users list, delete user, reset password
    - delete removes user, all posts, all comments by user, and user's tickets
-   - also renders and manages custom badges
+   - also renders and manages custom badges and assignment UI
 ===================================================== */
 
 function openAdminPanel() {
@@ -535,20 +552,41 @@ function openAdminPanel() {
     const users = getUsers();
     const custom = getCustomBadges();
 
-    // Users list
+    // Users list with badge assignment controls
     let html = '';
     for (let uname in users) {
         if (uname === ADMIN_USER) continue;
         const u = users[uname];
+
+        // Build badge selector HTML (standard + custom)
+        let badgeSelectorHtml = '';
+        const standardBadges = [
+            { key: 'vip', label: '💎 VIP' },
+            { key: 'verified', label: '✓ Vérifié' },
+            { key: 'star', label: '⭐ Star' }
+        ];
+
+        standardBadges.forEach(b => {
+            const active = (u.badges || []).includes(b.key) ? 'active' : '';
+            badgeSelectorHtml += `<div class="badge-option ${active}" onclick="toggleBadge('${uname}','${b.key}', this)">${b.label}</div>`;
+        });
+
+        // custom badges
+        for (let cb in custom) {
+            const active = (u.badges || []).includes(cb) ? 'active' : '';
+            badgeSelectorHtml += `<div class="badge-option ${active}" style="background:${custom[cb].color}" onclick="toggleBadge('${uname}','${cb}', this)">${custom[cb].icon || ''} ${cb}</div>`;
+        }
+
         html += `<div class="user-item" style="display:flex;align-items:center;justify-content:space-between;padding:8px;border:1px solid var(--border);margin-bottom:8px;border-radius:8px;">
             <div style="display:flex;gap:10px;align-items:center;">
                 <img class="pfp" src="${u.pfp || 'https://i.imgur.com/4ZQZ4Fc.png'}" style="width:36px;height:36px;">
                 <div>
                   <b>${uname}</b> <div class="small">${u.karma || 0} karma • inscrit ${formatDate(u.createdAt)}</div>
-                  <div>${getBadgeHTML(uname)}</div>
+                  <div style="margin-top:6px;">${getBadgeHTML(uname)}</div>
+                  <div style="margin-top:8px;">${badgeSelectorHtml}</div>
                 </div>
             </div>
-            <div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
                 <button onclick="resetPassword('${uname}')">🔑 Reset</button>
                 <button onclick="deleteUser('${uname}')" style="background:var(--danger);">🗑 Supprimer</button>
             </div>
@@ -669,8 +707,36 @@ function deleteCustomBadge(name) {
 }
 
 /* =====================================================
+   Badge assignment: toggleBadge(username, badge)
+   - works for standard and custom badges
+   - updates users[username].badges and refreshes admin panel
+===================================================== */
+function toggleBadge(username, badge, elm) {
+    if (localStorage.getItem('user') !== ADMIN_USER) return alert("Accès admin requis.");
+    const users = getUsers();
+    if (!users[username]) return alert("Utilisateur introuvable.");
+
+    users[username].badges = users[username].badges || [];
+    const idx = users[username].badges.indexOf(badge);
+    if (idx >= 0) {
+        users[username].badges.splice(idx,1);
+        showNotification(`❌ Badge "${badge}" retiré à ${username}`);
+    } else {
+        users[username].badges.push(badge);
+        showNotification(`✅ Badge "${badge}" attribué à ${username}`);
+    }
+    saveUsers(users);
+
+    // Update the element visual state quickly (if provided)
+    if (elm) {
+        elm.classList.toggle('active');
+    }
+    // Refresh admin panel to reflect changes in other UI places
+    openAdminPanel();
+}
+
+/* =====================================================
    Tickets: send, render, admin reply, mark resolved, delete
-   Ticket object: { user, msg, status, createdAt, replies: [{by, msg, at}], resolvedAt? }
 ===================================================== */
 
 function openTicketPanel() {
@@ -720,7 +786,6 @@ function renderTicketList() {
             </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;margin-left:10px;">
-                <!-- if admin: reply textarea / buttons -->
                 ${localStorage.getItem('user') === ADMIN_USER ? `
                     <textarea id="reply-input-${i}" placeholder="Répondre..." style="width:220px;height:60px;"></textarea>
                     <button onclick="replyToTicket(${i})">Répondre</button>
@@ -744,7 +809,6 @@ function replyToTicket(i) {
     const tickets = getTickets();
     tickets[i].replies = tickets[i].replies || [];
     tickets[i].replies.push({ by: ADMIN_USER, msg: text, at: Date.now() });
-    // set status to En attente -> admin answered so maybe still En attente or "En cours"
     tickets[i].status = 'En attente';
     saveTickets(tickets);
     showNotification('✉️ Répondu au ticket.');
@@ -761,7 +825,6 @@ function markTicketResolved(i) {
     renderTicketList();
 }
 
-// allow user to mark their own ticket resolved (confirmation)
 function markMyTicket(i) {
     const user = localStorage.getItem('user') || 'Anonyme';
     const tickets = getTickets();
@@ -783,8 +846,6 @@ function deleteTicket(i) {
 
 /* =====================================================
    Posts: create, save, render
-   - rendering uses timeAgo and shows votes
-   - filters implemented
 ===================================================== */
 
 function addPost() {
@@ -1021,7 +1082,6 @@ function closeProfile() {
 }
 
 function trigger_profileImagePick_compat() {
-    // fallback if triggerProfileImagePick isn't bound (older versions)
     profileImageInput.click();
 }
 
@@ -1039,7 +1099,6 @@ profileImageInput.addEventListener('change', function() {
         profilePreview.style.display = 'block';
         saveProfileImageBtn.style.display = 'inline-block';
         cancelProfileImageBtn.style.display = 'inline-block';
-        // show preview immediate
         profilePicture.src = stagedProfileImageData;
     };
     reader.readAsDataURL(file);
